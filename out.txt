@@ -1,0 +1,16 @@
+numprocs=60
+NEURON -- VERSION 8.1.0 HEAD (047dd824) 2022-03-25
+Duke, Yale, and the BlueBrain Project -- Copyright 1984-2021
+See http://neuron.yale.edu/neuron/credits
+
+2022-09-14 19:10:37,239 [INFO] Created log file
+2022-09-14 19:10:37,240 [INFO] Running NEURON with mpi (60 cores).
+Additional mechanisms from files
+ "bg2pyr.mod" "ch_CavL.mod" "ch_CavN.mod" "ch_HCN.mod" "ch_HCNolm.mod" "ch_HCNp.mod" "ch_KCaS.mod" "ch_Kdrfast.mod" "ch_Kdrfastngf.mod" "ch_Kdrp.mod" "ch_Kdrslow.mod" "ch_KvAdistp.mod" "ch_KvA.mod" "ch_KvAngf.mod" "ch_KvAolm.mod" "ch_KvAproxp.mod" "ch_KvCaB.mod" "ch_KvGroup.mod" "ch_KvM.mod" "ch_leak.mod" "chn2pyr.mod" "ch_Navaxonp.mod" "ch_Navbis.mod" "ch_Navcck.mod" "ch_Nav.mod" "ch_Navngf.mod" "ch_Navp.mod" "ExpGABAab.mod" "iconc_Ca.mod" "int2int.mod" "int2pyr.mod" "kv.mod" "MyExp2Sid.mod" "MyExp2Sidnw.mod" "mynetstim.mod" "na12.mod" "na16.mod" "positionfcns.mod" "pyr2int.mod" "pyr2pyr.mod" "SIN.mod" "vecevent.mod" "xtra.mod"
+2022-09-14 19:10:37,470 [INFO] Building cells.
+2022-09-14 19:10:37,609 [INFO] Building recurrent connections
+2022-09-14 19:10:38,264 [INFO] Running simulation for 300.000 ms with the time step 0.100 ms
+2022-09-14 19:10:38,265 [INFO] Starting timestep: 0 at t_sim: 0.000 ms
+2022-09-14 19:10:38,265 [INFO] Block save every 3000 steps
+2022-09-14 19:11:07,488 [INFO]     step:3000 t_sim:300.00 ms
+2022-09-14 19:11:08,337 [INFO] Simulation completed in 30.17 seconds 

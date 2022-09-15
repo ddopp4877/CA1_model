@@ -1,0 +1,12 @@
+/CA1_Model_env
+/network
+/output
+/biophys_components/mechanisms/modfiles/*.[co]
+/CA1_inputs
+*.png
+.DS_Store
+/nrn
+/.libs
+/.idea
+/.ipynb_checkpoints
+/__pycache__
