@@ -22,7 +22,7 @@ numCCK =  36#360
 numNGF = 58#580
 numOLM =  16#164
 numPV =  55#553
-numPyr =  311#31150
+numPyr =  3115#31150
 
 # arrays for cell location csv
 cell_name = []

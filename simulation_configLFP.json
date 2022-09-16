@@ -27,9 +27,9 @@
       "gids": [
         1
       ],
-      "amp": 100,
+      "amp": 0.3,
       "delay": 100.0,
-      "duration": 50
+      "duration": 15
     }
     
  },
@@ -54,6 +54,13 @@
         "cells": "all",
         "module": "membrane_report",
         "sections": "soma"
+      },
+
+      "v_report_axon": {
+        "variable_name": "v",
+        "cells": [1,1519,2918],
+        "module": "membrane_report",
+        "sections": "axon"
       }
   },
   "node_sets_file": "$BASE_DIR/node_sets.json",
