@@ -6,6 +6,7 @@ from math import exp
 import numpy as np
 import pandas as pd
 import random
+import h5py
 import synapses
 
 synapses.load()
@@ -22,7 +23,7 @@ numCCK =  36#360
 numNGF = 58#580
 numOLM =  16#164
 numPV =  55#553
-numPyr =  3115#31150
+numPyr =  311#31150
 
 # arrays for cell location csv
 cell_name = []
@@ -163,7 +164,56 @@ setEdges(net,'Pyr','OLM',[  0.1320,   400],'OLM2OLM.json',[0.0,        400.0],'b
 
 net.build()
 net.save(output_dir='network')
+
 """
+import synapses
+import warnings
+from bmtk.simulator.core import simulation_config 
+from bmtk.simulator import bionet
+
+warnings.simplefilter(action='ignore', category=FutureWarning)
+synapses.load()
+from bmtk.simulator.bionet.pyfunction_cache import add_weight_function
+
+def gaussianBL(edge_props, source, target):
+    w0 = edge_props["syn_weight"]
+    sigma = edge_props["weight_sigma"]
+    return np.random.normal(w0, sigma, 1)
+
+def lognormal(edge_props, source, target):
+    m = edge_props["syn_weight"]
+    s = edge_props["weight_sigma"]
+    mean = np.log(m) - 0.5 * np.log((s / m) ** 2 + 1)
+    std = np.sqrt(np.log((s / m) ** 2 + 1))
+    return np.random.lognormal(mean, std, 1)
+
+add_weight_function(lognormal)
+add_weight_function(gaussianBL)
+
+conf = bionet.Config.from_json('simulation_configLFP.json', validate=True)
+#conf = simulation_config.from_json(config_file)
+conf.copy_to_output()
+conf.build_env()
+graph = bionet.BioNetwork.from_config(conf)
+
+# This fixes the morphology error in LFP calculation
+pop = graph._node_populations['biophysical']
+for node in pop.get_nodes():
+        node._node._node_type_props['morphology'] = node.model_template[1]
+
+sim = bionet.BioSimulator.from_config(conf, network=graph)
+
+# This calls insert_mechs() on each cell to use its gid as a seed
+# to the random number generator, so that each cell gets a different
+# random seed for the point-conductance noise
+cells = graph.get_local_cells()
+for cell in cells:
+    cells[cell].hobj.insert_mechs(cells[cell].gid)
+    pass
+
+sim.modules._save_synapses('network')
+
+
 psg = PoissonSpikeGenerator(population='bgpn',
        seed=222)
 
