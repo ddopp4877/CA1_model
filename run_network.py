@@ -56,7 +56,7 @@ def run(config_file):
         pass
     #bionet.modules.save_synapses.SaveSynapses('network')
     
-    sim.add_mod(bionet.modules.save_synapses.SaveSynapses('network'))
+    sim.add_mod(bionet.modules.save_synapses.SaveSynapses('updated_conns'))
     
     #synSave.initialize(sim)
     sim.run()
