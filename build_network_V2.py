@@ -23,7 +23,7 @@ numCCK =  36#360
 numNGF = 58#580
 numOLM =  16#164
 numPV =  55#553
-numPyr =  311#31150
+numPyr =  3115#31150
 
 # arrays for cell location csv
 cell_name = []
@@ -115,19 +115,22 @@ def setNodes(netObj,Number,posList,popName,mTemplate):
 
     return np.delete(posList, inds, 0)
 
+
+
 def setEdges(netObj,src,dest,conParams,dynamics_name,dist_range,secName,secID,secx):
-    netObj.add_edges(source={'pop_name': src}, target={'pop_name': dest},
+    conn = netObj.add_edges(source={'pop_name': src}, target={'pop_name': dest},
                      
                      connection_rule=n_connections,
                      connection_params={'prob': conParams[0], 'max_dist': conParams[1]},  
                      delay=0.1,
-                     syn_weight = syn[dynamics_name]['initW_lognormal_mean'],
+                     syn_weight = 10000,#syn[dynamics_name]['initW_lognormal_mean'],#syn[dynamics_name]['initW_lognormal_mean'],
                      dynamics_params=dynamics_name,
                      model_template=syn[dynamics_name]['level_of_detail'],
                      distance_range=dist_range,
                      target_sections=[secName],
                      sec_id = secID,  # check and is working putting syn on right location
                      sec_x = secx)
+    return conn
 
 ############################## x,y,z,     xlen,ylen,zlen, space
 pos_list_SO = make_layer_grid( 0,0,320,   400,1000,450,  20)
@@ -149,18 +152,32 @@ pos_list_SR = setNodes(net,numAAC_inSR,pos_list_SR,'AAC','hoc:axoaxoniccell')
 pos_list_SR = setNodes(net,numPV_inSR,pos_list_SR,'PV','hoc:pvbasketcell')
 
 #############src     dest   prob      maxd                   dist_range                 sid sec
-setEdges(net,'AAC','Pyr',[ 0.072,     400],'CHN2PN.json', [-10000.0, 10000.0],'axonal', 6, 0.5)
-setEdges(net,'Pyr','AAC',[ 0.009635,  400],'PN2CHN.json', [0.0,        400.0],'apical', 6, 0.5)
-setEdges(net,'PV','Pyr', [ 0.05366,   400],'PV2PN.json',  [0.0,        400.0],'somatic',0, 0.5)
-setEdges(net,'Pyr','PV', [ 0.0238,    400],'PV2PN.json',  [0.0,        400.0],'apical', 6, 0.5)
-setEdges(net,'PV','AAC', [ 0.135,     400],'PV2CHN.json', [0.0,        400.0],'somatic',0, 0.5)
-setEdges(net,'PV','PV',  [ 0.135,     400],'PV2PV.json',  [0.0,        400.0],'somatic',0, 0.5)
-setEdges(net,'OLM','Pyr',[ 0.08300,   400],'OLM2PN.json', [0.0,        400.0],'apical', 4, 0.5)
-setEdges(net,'OLM','AAC',[ 0.0800,    400],'OLM2CHN.json',[0.0,        400.0],'apical', 4, 0.5)
-setEdges(net,'OLM','PV', [ 0.0800,    400],'OLM2PV.json', [0.0,        400.0],'apical', 4, 0.5)
-setEdges(net,'OLM','OLM',[ 0.0800,    400],'OLM2OLM.json',[0.0,        400.0],'basal',  0, 0.9)
-setEdges(net,'Pyr','OLM',[  0.1320,   400],'OLM2OLM.json',[0.0,        400.0],'basal',  2, 0.5)
+conn1 = setEdges(net,'AAC','Pyr',[ 0.072,     400],'CHN2PN.json', [-1,             1],'axon', 0, 0.5)
+conn2 = setEdges(net,'Pyr','AAC',[ 0.009635,  400],'PN2CHN.json', [0.0,        400.0],'apical', 6, 0.5)
+conn3 = setEdges(net,'PV','Pyr', [ 0.05366,   400],'PV2PN.json',  [0.0,        400.0],'somatic',0, 0.5)
+conn4 = setEdges(net,'Pyr','PV', [ 0.0238,    400],'PV2PN.json',  [0.0,        400.0],'apical', 6, 0.5)
+conn5 = setEdges(net,'PV','AAC', [ 0.135,     400],'PV2CHN.json', [0.0,        400.0],'somatic',0, 0.5)
+conn6 = setEdges(net,'PV','PV',  [ 0.135,     400],'PV2PV.json',  [0.0,        400.0],'somatic',0, 0.5)
+conn7 = setEdges(net,'OLM','Pyr',[ 0.08300,   400],'OLM2PN.json', [0.0,        400.0],'apical', 4, 0.5)
+conn8 = setEdges(net,'OLM','AAC',[ 0.0800,    400],'OLM2CHN.json',[0.0,        400.0],'apical', 4, 0.5)
+conn9 = setEdges(net,'OLM','PV', [ 0.0800,    400],'OLM2PV.json', [0.0,        400.0],'apical', 4, 0.5)
+conn10 = setEdges(net,'OLM','OLM',[ 0.0800,    400],'OLM2OLM.json',[0.0,        400.0],'basal',  0, 0.9)
+conn11 = setEdges(net,'Pyr','OLM',[  0.1320,   400],'OLM2OLM.json',[0.0,        400.0],'basal',  2, 0.5)
 
+def lognormal(source, target,m,s):
+
+    mean = np.log(m) - 0.5 * np.log((s / m) ** 2 + 1)
+    std = np.sqrt(np.log((s / m) ** 2 + 1))
+    synaptic_weight = np.random.lognormal(mean, std, 1)
+    return synaptic_weight
+#print(conn1._edge_type_properties)
+#conn1.add_properties('syn_weight', rule=lognormal,rule_params={'m': syn[conn1._edge_type_properties['dynamics_params']]["initW_lognormal_mean"],
+# 's': syn[conn1._edge_type_properties['dynamics_params']]["initW_lognormal_std"]},  dtypes=np.float32)
+
+connList = [conn1,conn2,conn3,conn4,conn5,conn6,conn7,conn8,conn9,conn10,conn11]
+for conn in connList:
+    conn.add_properties('syn_weight', rule=lognormal,rule_params={'m': syn[conn._edge_type_properties['dynamics_params']]["initW_lognormal_mean"],
+    's': syn[conn._edge_type_properties['dynamics_params']]["initW_lognormal_std"]},  dtypes=np.float32)
 
 net.build()
 net.save(output_dir='network')

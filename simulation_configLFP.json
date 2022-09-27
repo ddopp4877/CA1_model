@@ -58,7 +58,7 @@
 
       "v_report_axon": {
         "variable_name": "v",
-        "gids": [1],
+        "gids": [40],
         "module": "membrane_report",
         "sections": "axon"
       }
