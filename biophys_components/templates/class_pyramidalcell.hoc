@@ -29,13 +29,13 @@ objref syn, pre_list, templist, rootlist, this
 NumSoma=1
 NumApical=9
 NumBasal=4
-NumAxon=1
+NumAxon=12
 create soma[NumSoma], apical[NumApical], basal[NumBasal], axon[NumAxon]
 
 proc init() { 
 	//gid = $1
 	//randi = $2
-	Vrest = -66 // -65 // $3 resting membrane potential in mV
+	Vrest = -70 // -65 // $3 resting membrane potential in mV
 	// cell sections: soma, dendrites, axon
 	append_sections() // append all sections to the section list
 	connect_sections()// connect soma, dendrites, axon
@@ -72,7 +72,19 @@ proc connect_sections() { local i
   connect basal[1](0), basal[0](1)
   connect basal[2](0), soma(0)
   connect basal[3](0), basal[2](1)
-  connect axon(0), soma(0)
+  connect axon[0](0), soma(0)
+  connect axon[1](0), axon[0](1)
+  connect axon[2](0), axon[1](1)
+  connect axon[3](0), axon[2](1)
+  connect axon[4](0), axon[3](1)
+  connect axon[5](0), axon[4](1)
+  connect axon[6](0), axon[5](1)
+  connect axon[7](0), axon[6](1)
+  connect axon[8](0), axon[7](1)
+  connect axon[9](0), axon[8](1)
+  connect axon[10](0), axon[9](1)
+  connect axon[11](0), axon[10](1)
+
   //basic_shape()
 }
 
@@ -149,7 +161,8 @@ proc append_sections() { local i
     basal[3] dendrite_list.append()
 }
 
-proc size_sections() {
+proc size_sections() {local thetaz
+	thetaz =0
 	soma[0] {pt3dclear()
 		pt3dadd(0.0, 0.0, 0.0, 10.0) // distance from (0,0,0) = 0
 		pt3dadd(0.0, 5.0, 0.0, 10.0) // distance from (0,0,0) = 10
@@ -229,11 +242,28 @@ proc size_sections() {
 	}
 
 
-	axon[0] {pt3dclear()
-		pt3dadd(0.0, 0.0, 0.0, 1.0) // distance from (0,0,0) = 0
-		pt3dadd(0.0, -75.0, 0.0, 1.0) // distance from (0,0,0) = 10
-		pt3dadd(0.0, -150.0, 0.0, 1.0) // distance from (0,0,0) = 20
-	}
+		axon[0]{pt3dclear()
+			pt3dadd(-12.707*cos(thetaz),-12.707*sin(thetaz),0,6)
+			pt3dadd(-14.707*cos(thetaz),-14.707*sin(thetaz),0,5)
+			pt3dadd(-16.707*cos(thetaz),-16.707*sin(thetaz),0,4)
+			pt3dadd(-18.707*cos(thetaz),-18.707*sin(thetaz),0,3)
+			pt3dadd(-20.707*cos(thetaz),-20.707*sin(thetaz),0,2)
+			pt3dadd(-22.707*cos(thetaz),-22.707*sin(thetaz),0,1.3)
+			nseg = 10
+		}
+		
+		for i=2,11{
+			axon[i-1] {pt3dclear()
+				pt3dadd((-22.707-5*(i-1))*cos(thetaz),(-22.707-5*(i-1))*sin(thetaz),0, 1.22)
+				pt3dadd((-27.707-5*(i-1))*cos(thetaz),(-27.707-5*(i-1))*sin(thetaz),0, 1.22)
+			}
+		}
+
+		axon[11]{pt3dclear()
+			pt3dadd(-72.707*cos(thetaz),-72.707*sin(thetaz),0,1.22)
+			pt3dadd(-172.707*cos(thetaz),-172.707*sin(thetaz),0,1.22)
+		}
+
 }
 
 external lambda_f
@@ -246,9 +276,9 @@ proc mechinit() {
 	NumSoma=1
 	NumApical=9
 	NumBasal=4
-	NumAxon=1
+	NumAxon=12
 
-	Rm = 28000 // 5555 // 
+	Rm = 140//28000 // 5555 // 
 	RmDend = Rm/2
 	RmSoma = Rm
 	RmAx = Rm
@@ -268,26 +298,59 @@ proc mechinit() {
 	ekval = -90
 	enaval = 55
 	eHCNval = -30
-	eleakval = 	-66 // not lower than ekval
+	eleakval = 	-70 // not lower than ekval
 
 	gNav     = 0.032 // Nav conductance in mho/cm2
-	gNavaxon = 0.064 // axon multiplier for Nav conductance
+	gNavaxon = 0.15//0.064 // axon multiplier for Nav conductance
 	gKdr     = 0.003 // Kdr conductance in mho/cm2
 	gKvAdist = 0.008 // distal KvA conductance in mho/cm2
 	gKvAprox = 0.008 // proximal KvA conductance in mho/cm2
 	gHCN     = 0.0006 // hcurrent conductance in mho/cm2 --> 6 pS/um2
+	gna16_ais_max = 60000
+	gkv_axon = 0.03
 }
 	
 proc insert_mechs() {
 	access soma[0]
 	distance() // calculates the distance between location 0 of the currently accessed section (as the origin) to a second point (but with this usage, it just sets the origin point) 
 
-	axon[0] {
-		insert ch_Navaxonp  gmax_ch_Navaxonp=gNavaxon
-		insert ch_Kdrp  gmax_ch_Kdrp=gKdr 
-		insert pas e_pas=eleakval g_pas = 1/RmAx Ra=RaAx cm=CmAx
-		insert ch_KvAproxp gmax_ch_KvAproxp = gKvAprox*0.2
+
+		for i=0,10 axon[i] {
+			insert pas e_pas=eleakval g_pas = 0.00013 Ra=RaAx cm=CmAx
+			insert na16
+			insert kv
+		}
+
+	axon[11] {
+			insert pas e_pas=eleakval g_pas = 0.00013 Ra=RaAx cm=CmAx
+			insert na16
+			insert kv
 	}
+		axon[0].gbar_na16 = gna16_ais_max	*	0.04	*	1   
+		axon[1].gbar_na16 = gna16_ais_max	*	0.1	*	1   
+		axon[2].gbar_na16 = gna16_ais_max	*	0.25	*	1   
+		axon[3].gbar_na16 = gna16_ais_max	*	0.45	*	0.95   
+		axon[4].gbar_na16 = gna16_ais_max	*	0.633014121	*	0.880142857   
+		axon[5].gbar_na16 = gna16_ais_max	*	0.8	*	0.75   
+		axon[6].gbar_na16 = gna16_ais_max	*	0.899669239	*	0.647857143   
+		axon[7].gbar_na16 = gna16_ais_max	*	0.988467875	*	0.520285714   
+		axon[8].gbar_na16 = gna16_ais_max	*	1	*	0.428571429   
+		axon[9].gbar_na16 = gna16_ais_max	*	1	*	0.342857143  
+		axon[10].gbar_na16 = gna16_ais_max	*	1	*	0.342857143  
+						
+		axon[11].gbar_na16 = gna16_ais_max	*	1	*	0.342857143  
+		axon[0].gbar_kv = gkv_axon	*	0.2 
+		axon[1].gbar_kv = gkv_axon	*	0.3 
+		axon[2].gbar_kv = gkv_axon	*	0.4 
+		axon[3].gbar_kv = gkv_axon	*	0.5 
+		axon[4].gbar_kv = gkv_axon	*	0.6 
+		axon[5].gbar_kv = gkv_axon	*	0.7 
+		axon[6].gbar_kv = gkv_axon	*	0.8 
+		axon[7].gbar_kv = gkv_axon	*	0.9
+		axon[8].gbar_kv = gkv_axon	*	1
+		axon[9].gbar_kv = gkv_axon	*	1
+		axon[10].gbar_kv = gkv_axon	*	1
+		axon[11].gbar_kv = gkv_axon	*	1
 
 	for i=0,NumSoma-1 soma[i] {   
 		insert ch_HCNp gmax_ch_HCNp=gHCN
@@ -296,7 +359,7 @@ proc insert_mechs() {
 		ar2_ch_Navp=1
 		insert ch_Kdrp gmax_ch_Kdrp=gKdr
 		insert ch_KvAproxp gmax_ch_KvAproxp = gKvAprox
-		insert pas e_pas=eleakval g_pas = 1/RmSoma Ra=RaSoma cm=CmSoma
+		insert pas e_pas=eleakval g_pas = 0.0013 Ra=RaSoma cm=CmSoma
 	}
 
 	for i=0,NumBasal-1 basal[i] {

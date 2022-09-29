@@ -19,8 +19,6 @@ rng = np.random.default_rng(seed)
 net = NetworkBuilder("biophysical")
 # amount of cells
 numAAC = 15#147
-numCCK =  36#360
-numNGF = 58#580
 numOLM =  16#164
 numPV =  55#553
 numPyr =  3115#31150
@@ -34,12 +32,6 @@ cell_z = []
 numAAC_inSO = int(round(numAAC*0.238))
 numAAC_inSP = int(round(numAAC*0.7))
 numAAC_inSR = int(round(numAAC*0.062))
-#numCCK_inSO = int(round(numCCK*0.217))
-#numCCK_inSP = int(round(numCCK*0.261))
-#numCCK_inSR = int(round(numCCK*0.325))
-#numCCK_inSLM = int(round(numCCK*0.197))
-#numNGF_inSR = int(round(numNGF*0.17))
-#numNGF_inSLM = int(round(numNGF*0.83))
 numPV_inSO = int(round(numPV*0.238))
 numPV_inSP = int(round(numPV*0.701))
 numPV_inSR = int(round(numPV*0.0596))
@@ -151,8 +143,8 @@ pos_list_SP = setNodes(net,numPV_inSP,pos_list_SP,'PV','hoc:pvbasketcell')
 pos_list_SR = setNodes(net,numAAC_inSR,pos_list_SR,'AAC','hoc:axoaxoniccell')
 pos_list_SR = setNodes(net,numPV_inSR,pos_list_SR,'PV','hoc:pvbasketcell')
 
-#############src     dest   prob      maxd                   dist_range                 sid sec
-conn1 = setEdges(net,'AAC','Pyr',[ 0.072,     400],'CHN2PN.json', [-1,             1],'axon', 0, 0.5)
+#############        src     dest   prob      maxd     json              dist_range    secName sid secloc
+conn1 = setEdges(net,'AAC','Pyr',[ 0.072,     400],'CHN2PN.json', [0,            50 ],'axon', 1, 0.5)
 conn2 = setEdges(net,'Pyr','AAC',[ 0.009635,  400],'PN2CHN.json', [0.0,        400.0],'apical', 6, 0.5)
 conn3 = setEdges(net,'PV','Pyr', [ 0.05366,   400],'PV2PN.json',  [0.0,        400.0],'somatic',0, 0.5)
 conn4 = setEdges(net,'Pyr','PV', [ 0.0238,    400],'PV2PN.json',  [0.0,        400.0],'apical', 6, 0.5)
@@ -170,9 +162,7 @@ def lognormal(source, target,m,s):
     std = np.sqrt(np.log((s / m) ** 2 + 1))
     synaptic_weight = np.random.lognormal(mean, std, 1)
     return synaptic_weight
-#print(conn1._edge_type_properties)
-#conn1.add_properties('syn_weight', rule=lognormal,rule_params={'m': syn[conn1._edge_type_properties['dynamics_params']]["initW_lognormal_mean"],
-# 's': syn[conn1._edge_type_properties['dynamics_params']]["initW_lognormal_std"]},  dtypes=np.float32)
+
 
 connList = [conn1,conn2,conn3,conn4,conn5,conn6,conn7,conn8,conn9,conn10,conn11]
 for conn in connList:
@@ -183,91 +173,7 @@ net.build()
 net.save(output_dir='network')
 
 """
-import synapses
-import warnings
-from bmtk.simulator.core import simulation_config 
-from bmtk.simulator import bionet
 
-warnings.simplefilter(action='ignore', category=FutureWarning)
-synapses.load()
-from bmtk.simulator.bionet.pyfunction_cache import add_weight_function
-
-def gaussianBL(edge_props, source, target):
-    w0 = edge_props["syn_weight"]
-    sigma = edge_props["weight_sigma"]
-    return np.random.normal(w0, sigma, 1)
-
-def lognormal(edge_props, source, target):
-    m = edge_props["syn_weight"]
-    s = edge_props["weight_sigma"]
-    mean = np.log(m) - 0.5 * np.log((s / m) ** 2 + 1)
-    std = np.sqrt(np.log((s / m) ** 2 + 1))
-    return np.random.lognormal(mean, std, 1)
-
-add_weight_function(lognormal)
-add_weight_function(gaussianBL)
-
-conf = bionet.Config.from_json('simulation_configLFP.json', validate=True)
-#conf = simulation_config.from_json(config_file)
-conf.copy_to_output()
-conf.build_env()
-graph = bionet.BioNetwork.from_config(conf)
-
-# This fixes the morphology error in LFP calculation
-pop = graph._node_populations['biophysical']
-for node in pop.get_nodes():
-        node._node._node_type_props['morphology'] = node.model_template[1]
-
-sim = bionet.BioSimulator.from_config(conf, network=graph)
-
-# This calls insert_mechs() on each cell to use its gid as a seed
-# to the random number generator, so that each cell gets a different
-# random seed for the point-conductance noise
-cells = graph.get_local_cells()
-for cell in cells:
-    cells[cell].hobj.insert_mechs(cells[cell].gid)
-    pass
-
-sim.modules._save_synapses('network')
-
-
-psg = PoissonSpikeGenerator(population='bgpn',
-       seed=222)
-
-psg.add(node_ids=range(0,numPyr),  # need same number as cells
-        firing_rate=2,    # spikes/second
-        times=(0, 300/1000))#seconds
-
-psg.to_sonata('CA1_inputs/bg_pn_spikes.h5')
-
-
-vNet = NetworkBuilder('bgpn')
-vNet.add_nodes(
-    N=totalCellNum,
-    pop_name='bgpn',
-    potential='exc',
-    model_type='virtual'
-)
-
-
-vNet.add_edges(source=vNet.nodes(), target=net.nodes(),
-              connection_rule= 1,
-              syn_weight=0.001,
-              target_sections=['soma'],
-              delay=0.2,
-              distance_range=[0.0, 400],
-
-              dynamics_params='AMPA_ExcToExc.json',
-              model_template='exp2syn')
-vNet.build()
-vNet.save_nodes(output_dir='network')
-vNet.save_edges(output_dir='network')
-
-for item in net.nodes():
-    print(item)
-
-for item in vNet.nodes():
-    print(item)
 
 #use the below on the first build, then add mechanisms directory to the circuit config manually and comment out what is below
 
