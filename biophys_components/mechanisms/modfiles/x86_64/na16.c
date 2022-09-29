@@ -149,7 +149,7 @@ extern void hoc_reg_nmodl_filename(int, const char*);
 #define thi1 thi1_na16
  double thi1 = -50;
 #define tha tha_na16
- double tha = -63;
+ double tha = -43;
 #define usetable usetable_na16
  double usetable = 1;
 #define vshift vshift_na16
@@ -667,7 +667,7 @@ static const char* nmodl_file_text =
   "	gbar = 1000   	(pS/um2)	: 0.12 mho/cm2\n"
   "	vshift = -2	(mV)		: voltage shift (affects all)\n"
   "								\n"
-  "	tha  = -63	(mV)		: v 1/2 for act		(-42)\n"
+  "	tha  = -43	(mV)		: v 1/2 for act		(-42)\n"
   "	qa   = 6	(mV)		: act slope		\n"
   "	Ra   = 0.182	(/ms)		: open (v)		\n"
   "	Rb   = 0.124	(/ms)		: close (v)		\n"
