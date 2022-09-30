@@ -306,8 +306,8 @@ proc mechinit() {
 	gKvAdist = 0.008 // distal KvA conductance in mho/cm2
 	gKvAprox = 0.008 // proximal KvA conductance in mho/cm2
 	gHCN     = 0.0006 // hcurrent conductance in mho/cm2 --> 6 pS/um2
-	gna16_ais_max = 6400
-	gkv_axon = 500
+	gna16_ais_max = 3200
+	gkv_axon = 1000
 }
 	
 proc insert_mechs() {
@@ -317,18 +317,13 @@ proc insert_mechs() {
 	distance() // calculates the distance between location 0 of the currently accessed section (as the origin) to a second point (but with this usage, it just sets the origin point) 
 
 
-		for i=0,10 axon[i] {
+		for i=0,11 axon[i] {
 			insert pas e_pas=eleakval g_pas = 1/Rm Ra=RaAx cm=CmAx
 			insert na16
 			insert kv
 		}
 
-	axon[11] {
-			insert pas e_pas=eleakval g_pas = 1/Rm Ra=RaAx cm=CmAx
-			insert na16
-			insert kv
-	}
-		axon[0].gbar_na16 = gna16_ais_max	*	0.04	*	1   
+		axon[0].gbar_na16 = gna16_ais_max	*	0.9	*	1   
 		axon[1].gbar_na16 = gna16_ais_max	*	0.1	*	1   
 		axon[2].gbar_na16 = gna16_ais_max	*	0.25	*	1   
 		axon[3].gbar_na16 = gna16_ais_max	*	0.45	*	0.95   
@@ -339,8 +334,8 @@ proc insert_mechs() {
 		axon[8].gbar_na16 = gna16_ais_max	*	1	*	0.428571429   
 		axon[9].gbar_na16 = gna16_ais_max	*	1	*	0.342857143  
 		axon[10].gbar_na16 = gna16_ais_max	*	1	*	0.342857143  
-						
 		axon[11].gbar_na16 = gna16_ais_max	*	1	*	0.342857143  
+		
 		axon[0].gbar_kv = gkv_axon	*	0.2 
 		axon[1].gbar_kv = gkv_axon	*	0.3 
 		axon[2].gbar_kv = gkv_axon	*	0.4 

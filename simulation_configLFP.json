@@ -16,7 +16,8 @@
   },
   "conditions": {
     "celsius": 34.0,
-    "v_init": -70.0
+    "v_init": -63.0
+
   },
   "inputs": {
     
