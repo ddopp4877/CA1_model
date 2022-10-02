@@ -114,8 +114,8 @@ def setEdges(netObj,src,dest,conParams,dynamics_name,dist_range,secName,secID,se
                      
                      connection_rule=n_connections,
                      connection_params={'prob': conParams[0], 'max_dist': conParams[1]},  
-                     delay=0.1,
-                     syn_weight = 10000,#syn[dynamics_name]['initW_lognormal_mean'],#syn[dynamics_name]['initW_lognormal_mean'],
+                     delay=0.8,
+                     syn_weight = 20,#syn[dynamics_name]['initW_lognormal_mean'],#syn[dynamics_name]['initW_lognormal_mean'],
                      dynamics_params=dynamics_name,
                      model_template=syn[dynamics_name]['level_of_detail'],
                      distance_range=dist_range,
@@ -144,7 +144,7 @@ pos_list_SR = setNodes(net,numAAC_inSR,pos_list_SR,'AAC','hoc:axoaxoniccell')
 pos_list_SR = setNodes(net,numPV_inSR,pos_list_SR,'PV','hoc:pvbasketcell')
 
 #############        src     dest   prob      maxd     json              dist_range    secName sid secloc
-conn1 = setEdges(net,'AAC','Pyr',[ 0.072,     400],'CHN2PN.json', [0,            50 ],'axon', 1, 0.5)
+conn1 = setEdges(net,'AAC','Pyr',[ 0.072,     400],'CHN2PN.json', [1,            1.1 ],'axon', 6, 0.5)
 conn2 = setEdges(net,'Pyr','AAC',[ 0.009635,  400],'PN2CHN.json', [0.0,        400.0],'apical', 6, 0.5)
 conn3 = setEdges(net,'PV','Pyr', [ 0.05366,   400],'PV2PN.json',  [0.0,        400.0],'somatic',0, 0.5)
 conn4 = setEdges(net,'Pyr','PV', [ 0.0238,    400],'PV2PN.json',  [0.0,        400.0],'apical', 6, 0.5)
@@ -164,10 +164,10 @@ def lognormal(source, target,m,s):
     return synaptic_weight
 
 
-connList = [conn1,conn2,conn3,conn4,conn5,conn6,conn7,conn8,conn9,conn10,conn11]
-for conn in connList:
-    conn.add_properties('syn_weight', rule=lognormal,rule_params={'m': syn[conn._edge_type_properties['dynamics_params']]["initW_lognormal_mean"],
-    's': syn[conn._edge_type_properties['dynamics_params']]["initW_lognormal_std"]},  dtypes=np.float32)
+#connList = [conn1,conn2,conn3,conn4,conn5,conn6,conn7,conn8,conn9,conn10,conn11]
+#for conn in connList:
+#    conn.add_properties('syn_weight', rule=lognormal,rule_params={'m': syn[conn._edge_type_properties['dynamics_params']]["initW_lognormal_mean"],
+#    's': syn[conn._edge_type_properties['dynamics_params']]["initW_lognormal_std"]},  dtypes=np.float64)
 
 net.build()
 net.save(output_dir='network')
