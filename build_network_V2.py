@@ -115,7 +115,7 @@ def setEdges(netObj,src,dest,conParams,dynamics_name,dist_range,secName,secID,se
                      connection_rule=n_connections,
                      connection_params={'prob': conParams[0], 'max_dist': conParams[1]},  
                      delay=0.8,
-                     syn_weight = 20,#syn[dynamics_name]['initW_lognormal_mean'],#syn[dynamics_name]['initW_lognormal_mean'],
+                     syn_weight = 18,#syn[dynamics_name]['initW_lognormal_mean'],#syn[dynamics_name]['initW_lognormal_mean'],
                      dynamics_params=dynamics_name,
                      model_template=syn[dynamics_name]['level_of_detail'],
                      distance_range=dist_range,

@@ -93,7 +93,22 @@ objref all, basal_list, apical_list, soma_list, axon_list, rad_list, lm_list, de
 proc append_sections() { local i
   objref all, basal_list, apical_list, soma_list, axon_list, rad_list, lm_list, dendrite_list
   all = new SectionList()
-    soma all.append()
+    
+	soma all.append()
+
+	axon[0] all.append()
+	axon[1] all.append()
+	axon[2] all.append()
+	axon[3] all.append()
+	axon[4] all.append()
+	axon[5] all.append()
+	axon[6] all.append()
+	axon[7] all.append()
+	axon[8] all.append()
+	axon[9] all.append()
+	axon[10] all.append()
+	axon[11] all.append()
+
     apical[0] all.append()
     apical[1] all.append()
     apical[2] all.append()
@@ -103,11 +118,17 @@ proc append_sections() { local i
     apical[6] all.append()
     apical[7] all.append()
     apical[8] all.append()
+
+
+
+
     basal[0] all.append()
     basal[1] all.append()
     basal[2] all.append()
     basal[3] all.append()
-    axon all.append()
+	
+
+
 	
 	basal_list = new SectionList()
     basal[0] basal_list.append()
@@ -126,11 +147,22 @@ proc append_sections() { local i
     apical[7] apical_list.append()
     apical[8] apical_list.append()
 	
-	soma_list = new SectionList()
-    soma soma_list.append()
+	//soma_list = new SectionList()
+    //soma soma_list.append()
 	
 	axon_list = new SectionList()
-    axon axon_list.append()
+    axon[0] axon_list.append()
+	axon[1] axon_list.append()
+	axon[2] axon_list.append()
+	axon[3] axon_list.append()
+	axon[4] axon_list.append()
+	axon[5] axon_list.append()
+	axon[6] axon_list.append()
+	axon[7] axon_list.append()
+	axon[8] axon_list.append()
+	axon[9] axon_list.append()
+	axon[10] axon_list.append()
+	axon[11] axon_list.append()
 	
 	rad_list = new SectionList()
     apical[0] rad_list.append()
@@ -159,6 +191,8 @@ proc append_sections() { local i
     basal[1] dendrite_list.append()
     basal[2] dendrite_list.append()
     basal[3] dendrite_list.append()
+
+	
 }
 
 proc size_sections() {local thetaz

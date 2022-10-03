@@ -26,7 +26,7 @@
       "module": "IClamp",
       "node_set": "all",
       "gids": [
-        1,3156
+        1
       ],
       "amp": 0.3,
       "delay": 100.0,
@@ -61,8 +61,18 @@
         "variable_name": "v",
         "gids": [53],
         "module": "membrane_report",
-        "sections": "axon"
+        "sections": "all"
+      },
+
+      "i_report_syn":{
+        "variable_name":"igaba",
+        "cells": [53],
+        "module": "netcon_report",
+        "sections": "axon",
+        "syn_type":"chn2pyr"
       }
+
+
   },
   "node_sets_file": "$BASE_DIR/node_sets.json",
   "network": "$BASE_DIR/circuit_config.json"
