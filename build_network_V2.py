@@ -115,7 +115,7 @@ def setEdges(netObj,src,dest,conParams,dynamics_name,dist_range,secName,secID,se
                      connection_rule=n_connections,
                      connection_params={'prob': conParams[0], 'max_dist': conParams[1]},  
                      delay=0.8,
-                     syn_weight = 18,#syn[dynamics_name]['initW_lognormal_mean'],#syn[dynamics_name]['initW_lognormal_mean'],
+                     syn_weight = syn[dynamics_name]['initW_lognormal_mean'],#syn[dynamics_name]['initW_lognormal_mean'],
                      dynamics_params=dynamics_name,
                      model_template=syn[dynamics_name]['level_of_detail'],
                      distance_range=dist_range,
@@ -164,10 +164,10 @@ def lognormal(source, target,m,s):
     return synaptic_weight
 
 
-#connList = [conn1,conn2,conn3,conn4,conn5,conn6,conn7,conn8,conn9,conn10,conn11]
-#for conn in connList:
-#    conn.add_properties('syn_weight', rule=lognormal,rule_params={'m': syn[conn._edge_type_properties['dynamics_params']]["initW_lognormal_mean"],
-#    's': syn[conn._edge_type_properties['dynamics_params']]["initW_lognormal_std"]},  dtypes=np.float64)
+connList = [conn1,conn2,conn3,conn4,conn5,conn6,conn7,conn8,conn9,conn10,conn11]
+for conn in connList:
+    conn.add_properties('syn_weight', rule=lognormal,rule_params={'m': syn[conn._edge_type_properties['dynamics_params']]["initW_lognormal_mean"],
+    's': syn[conn._edge_type_properties['dynamics_params']]["initW_lognormal_std"]},  dtypes=np.float64)
 
 net.build()
 net.save(output_dir='network')

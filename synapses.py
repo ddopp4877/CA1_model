@@ -468,6 +468,7 @@ def Chn2Pyr(syn_params, sec_x, sec_id):
         if log_weight >= float(5*m):
             log_weight = float(5*m)
         lsyn.initW = float(log_weight) # par.x(0) * rC.uniform(0.5,1.0)//rand.normal(0.5,1.5) //`rand.repick()
+        
 
     if syn_params.get('Wmax'):
         lsyn.Wmax = float(syn_params['Wmax']) * lsyn.initW # par.x(1) * lsyn.initW

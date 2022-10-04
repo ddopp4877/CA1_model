@@ -363,7 +363,7 @@ proc insert_mechs() {
 		axon[3].gbar_na16 = gna16_ais_max	*	0.45	*	0.95   
 		axon[4].gbar_na16 = gna16_ais_max	*	0.633014121	*	0.880142857   
 		axon[5].gbar_na16 = gna16_ais_max	*	0.8	*	0.75   
-		axon[6].gbar_na16 = gna16_ais_max	*	0.899669239	*	0.647857143   
+		axon[6].gbar_na16 = gna16_ais_max	*	0.899669239	*	0.647857143  
 		axon[7].gbar_na16 = gna16_ais_max	*	0.988467875	*	0.520285714   
 		axon[8].gbar_na16 = gna16_ais_max	*	1	*	0.428571429   
 		axon[9].gbar_na16 = gna16_ais_max	*	1	*	0.342857143  
