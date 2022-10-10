@@ -21,7 +21,7 @@ net = NetworkBuilder("biophysical")
 numAAC = 15#147
 numOLM =  16#164
 numPV =  55#553
-numPyr =  3115#31150
+numPyr =  20000#31150
 
 # arrays for cell location csv
 cell_name = []
@@ -155,6 +155,10 @@ conn8 = setEdges(net,'OLM','AAC',[ 0.0800,    400],'OLM2CHN.json',[0.0,        4
 conn9 = setEdges(net,'OLM','PV', [ 0.0800,    400],'OLM2PV.json', [0.0,        400.0],'apical', 4, 0.5)
 conn10 = setEdges(net,'OLM','OLM',[ 0.0800,    400],'OLM2OLM.json',[0.0,        400.0],'basal',  0, 0.9)
 conn11 = setEdges(net,'Pyr','OLM',[  0.1320,   400],'OLM2OLM.json',[0.0,        400.0],'basal',  2, 0.5)
+
+
+
+
 
 def lognormal(source, target,m,s):
 

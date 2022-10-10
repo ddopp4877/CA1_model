@@ -25,9 +25,7 @@
       "input_type": "current_clamp",
       "module": "IClamp",
       "node_set": "all",
-      "gids": [
-        1
-      ],
+      "gids": [0,1,2,3],
       "amp": 0.3,
       "delay": 100.0,
       "duration": 15
@@ -71,9 +69,10 @@
         "sections": "axon",
         "syn_type":"chn2pyr"
       }
+      },
 
 
-  },
+  
   "node_sets_file": "$BASE_DIR/node_sets.json",
   "network": "$BASE_DIR/circuit_config.json"
 }
