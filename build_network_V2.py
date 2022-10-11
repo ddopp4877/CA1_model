@@ -8,7 +8,7 @@ import pandas as pd
 import random
 import h5py
 import synapses
-
+from math import ceil
 synapses.load()
 syn = synapses.syn_params_dicts()
 
@@ -17,27 +17,42 @@ seed = 999
 rng = np.random.default_rng(seed)
 
 net = NetworkBuilder("biophysical")
-# amount of cells
-numAAC = 15#147
-numOLM =  16#164
-numPV =  55#553
-numPyr =  20000#31150
 
+# amount of cells
+NetNo = 5000
+IN_num = NetNo*.11#about 11% of all neurons are interneurons in this network (Bezaire 2013). We are only modeling 2, so omit the others, or substitute PV and OLM for all
+PN_num = NetNo -  IN_num
+
+
+numOLM = .043*IN_num # 4% of all INs are OLMs
+numPV = .144*IN_num
+numPyr = PN_num
+numAAC = 0.038*IN_num
+
+
+# amount of cells per layer
+numAAC_inSO = int(ceil(numAAC*0.238))  # sometimes the num will be <1 so always round up so there is at least one.
+numPV_inSO = int(ceil(numPV*0.238))
+numOLM_inSO = int(ceil(numOLM))
+
+numAAC_inSP = int(ceil(numAAC*0.7))
+numPV_inSP = int(ceil(numPV*0.702))
+numPyr_inSP = int(ceil(numPyr))
+
+numAAC_inSR = int(ceil(numAAC*0.061))
+numPV_inSR = int(ceil(numPV*0.0597))
 # arrays for cell location csv
 cell_name = []
 cell_x = []
 cell_y = []
 cell_z = []
-# amount of cells per layer
-numAAC_inSO = int(round(numAAC*0.238))
-numAAC_inSP = int(round(numAAC*0.7))
-numAAC_inSR = int(round(numAAC*0.062))
-numPV_inSO = int(round(numPV*0.238))
-numPV_inSP = int(round(numPV*0.701))
-numPV_inSR = int(round(numPV*0.0596))
+
+
+
+
 #not commented out previously
 #totalCellNum = numAAC_inSO + numAAC_inSP + numAAC_inSR + numCCK_inSO + numCCK_inSP + numCCK_inSR + numCCK_inSLM + numNGF_inSR + numNGF_inSLM + numPV_inSO + numPV_inSP + numPV_inSR
-totalCellNum = numAAC_inSO + numAAC_inSP + numAAC_inSR +  numPV_inSO + numPV_inSP + numPV_inSR + numPyr + numOLM
+totalCellNum = numAAC_inSO + numPV_inSO + numOLM_inSO + numAAC_inSP + numPV_inSP+  numPyr_inSP+ numAAC_inSR  + numPV_inSR
 
 
 def AAC_to_PYR(src, trg, a, x0, sigma, max_dist):
@@ -128,15 +143,15 @@ def setEdges(netObj,src,dest,conParams,dynamics_name,dist_range,secName,secID,se
 pos_list_SO = make_layer_grid( 0,0,320,   400,1000,450,  20)
 pos_list_SP = make_layer_grid( 0,0,290,   400,1000,320,   8)
 pos_list_SR = make_layer_grid( 0,0, 80,   400,1000,290,  20)
-pos_list_SLM = make_layer_grid(0,0,  0,   400,1000, 79,  20)
+
 
 ########## add cells and connections to the network
 
 pos_list_SO = setNodes(net,numAAC_inSO,pos_list_SO,'AAC','hoc:axoaxoniccell')
-pos_list_SO = setNodes(net,numOLM,pos_list_SO,'OLM','hoc:olmcell')
+pos_list_SO = setNodes(net,numOLM_inSO,pos_list_SO,'OLM','hoc:olmcell')
 pos_list_SO = setNodes(net,numPV_inSO,pos_list_SO,'PV','hoc:pvbasketcell')
 
-pos_list_SP = setNodes(net,numPyr,pos_list_SP,'Pyr','hoc:pyramidalcell')
+pos_list_SP = setNodes(net,numPyr_inSP,pos_list_SP,'Pyr','hoc:pyramidalcell')
 pos_list_SP = setNodes(net,numAAC_inSP,pos_list_SP,'AAC','hoc:axoaxoniccell')
 pos_list_SP = setNodes(net,numPV_inSP,pos_list_SP,'PV','hoc:pvbasketcell')
 
@@ -177,7 +192,35 @@ net.build()
 net.save(output_dir='network')
 
 """
+t_sim = 300
+build_env_bionet(base_dir='./',
+                network_dir='network',
+                config_file='config.json',
+                tstop=t_sim, dt=0.1,
+                report_vars=['v'],
+                clamp_reports=['se'],
+                se_voltage_clamp={
+                      "amps":[[-70, -70, -70]],
+                     "durations": [[t_sim, t_sim, t_sim]],
+                     'gids': [0],
+                     'rs': [0.01],
+                },
+                components_dir='biophys_components',
 
+                v_init=-63,
+                compile_mechanisms=False)
+
+
+
+tstop=t_sim, dt = 0.1,
+report_vars = ['v'],
+clamp_reports=['se'],#Records se clamp currents.
+                se_voltage_clamp={
+                     "amps":[[-70, -70, -70]],
+                     "durations": [[t_sim, t_sim, t_sim]],
+                     'gids': [5142],
+                     'rs': [0.01],
+                }
 
 #use the below on the first build, then add mechanisms directory to the circuit config manually and comment out what is below
 

@@ -29,7 +29,20 @@
       "amp": 0.3,
       "delay": 100.0,
       "duration": 15
-    }
+    },
+    "voltage_clamp": {
+      
+      
+      "input_type": "voltage_clamp",
+      "module": "SEClamp",
+      "sections": "soma",
+      "amps": [[-70,-70,-70],[-70,-70,-70]],
+      "durations": [[300,300,300],[300,300,300]],
+      "node_set": "all",
+      "gids":[0,1],
+      "rs": [0.01,0.01]
+      
+  }
     
  },
  
@@ -68,7 +81,20 @@
         "module": "netcon_report",
         "sections": "axon",
         "syn_type":"chn2pyr"
+      },
+      "voltage_clamp": {
+        "gids": [0,1],
+        "module": "clamp_report",
+        "sections": "soma",
+        "variable_name": "se",
+        "clamps": [0,1]
+    },
+    
+      "save_synapses_mod": {
+        "module": "save_synapses",
+        "network_dir": "updated_conns"
       }
+
       },
 
 

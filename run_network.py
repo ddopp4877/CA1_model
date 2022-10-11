@@ -48,7 +48,7 @@ def run(config_file):
         return synaptic_weight
     #add_weight_function(lognormal,'lognormal')
     sim = bionet.BioSimulator.from_config(conf, network=graph)
-    
+    #sim.add_mod(bionet.modules.save_synapses.SaveSynapses('updated_conns'))
 
 
     # This calls insert_mechs() on each cell to use its gid as a seed
@@ -58,7 +58,7 @@ def run(config_file):
     for cell in cells:
         cells[cell].hobj.insert_mechs(cells[cell].gid)
         pass
-    #bionet.modules.save_synapses.SaveSynapses('network')
+    #bionet.modules.save_synapses.SaveSynapses('updated_conns')
     
     #synSave.initialize(sim)
     sim.run()
