@@ -19,7 +19,7 @@ rng = np.random.default_rng(seed)
 net = NetworkBuilder("biophysical")
 
 # amount of cells
-NetNo = 5000
+NetNo = 20000
 IN_num = NetNo*.11#about 11% of all neurons are interneurons in this network (Bezaire 2013). We are only modeling 2, so omit the others, or substitute PV and OLM for all
 PN_num = NetNo -  IN_num
 

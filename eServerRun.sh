@@ -7,4 +7,5 @@ if [ -d "output" ]; then
 	mkdir "output"
 fi
 
+
 time mpirun -np 50 nrniv -mpi -python run_network.py
