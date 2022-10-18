@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "scoplib_ansi.h"
+#include "scoplib.h"
 #undef PI
 #define nil 0
 #include "md1redef.h"
@@ -128,14 +128,10 @@ extern "C" {
  static int hoc_nrnpointerindex =  -1;
  /* external NEURON variables */
  /* declaration of user functions */
- static double _hoc_DA2();
- static double _hoc_DA1();
- static double _hoc_GAP1();
- static double _hoc_NE2();
- static double _hoc_NEn();
- static double _hoc_eta();
- static double _hoc_omega();
- static double _hoc_unirand();
+ static double _hoc_GAP1(void*);
+ static double _hoc_eta(void*);
+ static double _hoc_omega(void*);
+ static double _hoc_unirand(void*);
  static int _mechtype;
 extern void _nrn_cacheloop_reg(int, int);
 extern void hoc_register_prop_size(int, int, int);
@@ -154,18 +150,18 @@ extern void hoc_reg_nmodl_filename(int, const char*);
 
  extern Prop* nrn_point_prop_;
  static int _pointtype;
- static void* _hoc_create_pnt(_ho) Object* _ho; { void* create_point_process();
+ static void* _hoc_create_pnt(Object* _ho) { void* create_point_process(int, Object*);
  return create_point_process(_pointtype, _ho);
 }
- static void _hoc_destroy_pnt();
- static double _hoc_loc_pnt(_vptr) void* _vptr; {double loc_point_process();
+ static void _hoc_destroy_pnt(void*);
+ static double _hoc_loc_pnt(void* _vptr) {double loc_point_process(int, void*);
  return loc_point_process(_pointtype, _vptr);
 }
- static double _hoc_has_loc(_vptr) void* _vptr; {double has_loc_point();
+ static double _hoc_has_loc(void* _vptr) {double has_loc_point(void*);
  return has_loc_point(_vptr);
 }
- static double _hoc_get_loc_pnt(_vptr)void* _vptr; {
- double get_loc_point_process(); return (get_loc_point_process(_vptr));
+ static double _hoc_get_loc_pnt(void* _vptr) {
+ double get_loc_point_process(void*); return (get_loc_point_process(_vptr));
 }
  extern void _nrn_setdata_reg(int, void(*)(Prop*));
  static void _setdata(Prop* _prop) {
@@ -183,29 +179,17 @@ extern void hoc_reg_nmodl_filename(int, const char*);
  "loc", _hoc_loc_pnt,
  "has_loc", _hoc_has_loc,
  "get_loc", _hoc_get_loc_pnt,
- "DA2", _hoc_DA2,
- "DA1", _hoc_DA1,
  "GAP1", _hoc_GAP1,
- "NE2", _hoc_NE2,
- "NEn", _hoc_NEn,
  "eta", _hoc_eta,
  "omega", _hoc_omega,
  "unirand", _hoc_unirand,
  0, 0
 };
-#define DA2 DA2_int2int
-#define DA1 DA1_int2int
 #define GAP1 GAP1_int2int
-#define NE2 NE2_int2int
-#define NEn NEn_int2int
 #define eta eta_int2int
 #define omega omega_int2int
 #define unirand unirand_int2int
- extern double DA2( double , double );
- extern double DA1( double , double );
  extern double GAP1( double , double );
- extern double NE2( double , double );
- extern double NEn( double , double );
  extern double eta( double );
  extern double omega( double , double , double );
  extern double unirand( );
@@ -323,18 +307,18 @@ extern void hoc_reg_nmodl_filename(int, const char*);
 };
  static double _sav_indep;
  static void nrn_alloc(Prop*);
-static void  nrn_init(_NrnThread*, _Memb_list*, int);
-static void nrn_state(_NrnThread*, _Memb_list*, int);
- static void nrn_cur(_NrnThread*, _Memb_list*, int);
-static void  nrn_jacob(_NrnThread*, _Memb_list*, int);
- static void _hoc_destroy_pnt(_vptr) void* _vptr; {
+static void  nrn_init(NrnThread*, _Memb_list*, int);
+static void nrn_state(NrnThread*, _Memb_list*, int);
+ static void nrn_cur(NrnThread*, _Memb_list*, int);
+static void  nrn_jacob(NrnThread*, _Memb_list*, int);
+ static void _hoc_destroy_pnt(void* _vptr) {
    destroy_point_process(_vptr);
 }
  
 static int _ode_count(int);
 static void _ode_map(int, double**, double**, double*, Datum*, double*, int);
-static void _ode_spec(_NrnThread*, _Memb_list*, int);
-static void _ode_matsol(_NrnThread*, _Memb_list*, int);
+static void _ode_spec(NrnThread*, _Memb_list*, int);
+static void _ode_matsol(NrnThread*, _Memb_list*, int);
  
 #define _cvode_ieq _ppvar[5]._i
  static void _ode_matsol_instance1(_threadargsproto_);
@@ -466,7 +450,7 @@ static void nrn_alloc(Prop* _prop) {
  static void _update_ion_pointer(Datum*);
  extern Symbol* hoc_lookup(const char*);
 extern void _nrn_thread_reg(int, int, void(*)(Datum*));
-extern void _nrn_thread_table_reg(int, void(*)(double*, Datum*, Datum*, _NrnThread*, int));
+extern void _nrn_thread_table_reg(int, void(*)(double*, Datum*, Datum*, NrnThread*, int));
 extern void hoc_register_tolerance(int, HocStateTolerance*, Symbol***);
 extern void _cvode_abstol( Symbol**, double*, int);
 
@@ -498,7 +482,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
  pnt_receive[_mechtype] = _net_receive;
  pnt_receive_size[_mechtype] = 1;
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 int2int /home/dpd4k4/CA1_model/biophys_components/mechanisms/modfiles/x86_64/int2int.mod\n");
+ 	ivoc_help("help ?1 int2int /home/dpd4k4/CA1_model/biophys_components/mechanisms/modfiles/int2int.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -542,7 +526,7 @@ static int _ode_spec1(_threadargsproto_);
   return 0;
 }
  
-static void _net_receive (_pnt, _args, _lflag) Point_process* _pnt; double* _args; double _lflag; 
+static void _net_receive (Point_process* _pnt, double* _args, double _lflag) 
 {    _p = _pnt->_prop->param; _ppvar = _pnt->_prop->dparam;
   if (_tsav > t){ extern char* hoc_object_name(); hoc_execerror(hoc_object_name(_pnt->ob), ":Event arrived out of order. Must call ParallelContext.set_maxstep AFTER assigning minimum NetCon.delay");}
  _tsav = t;   if (_lflag == 1. ) {*(_tqitem) = 0;}
@@ -566,7 +550,7 @@ static void _net_receive (_pnt, _args, _lflag) Point_process* _pnt; double* _arg
      D1 = 1.0 - ( 1.0 - D1 ) * exp ( - ( t - tsyn ) / tauD1 ) ;
      D2 = 1.0 - ( 1.0 - D2 ) * exp ( - ( t - tsyn ) / tauD2 ) ;
      tsyn = t ;
-     facfactor = F * D1 * D2 ;
+     facfactor = 1.0 ;
      if ( F > 3.0 ) {
        F = 3.0 ;
        }
@@ -624,784 +608,6 @@ static double _hoc_omega(void* _vptr) {
  return(_r);
 }
  
-double DA1 (  double _lDAstart1 , double _lDAstop1 ) {
-   double _lDA1;
- double _lDAtemp1 , _lDAtemp2 , _lDAtemp3 , _lDAtemp4 , _lDAtemp5 , _lDAtemp6 , _lDAtemp7 , _lDAtemp8 , _lDAtemp9 , _lDAtemp10 , _lDAtemp11 , _lDAtemp12 , _lDAtemp13 , _lDAtemp14 , _lDAtemp15 , _lDAtemp16 , _lDAtemp17 , _lDAtemp18 , _lDAtemp19 , _lDAtemp20 , _lDAtemp21 , _lDAtemp22 , _lDAtemp23 , _lDAtemp24 , _lDAtemp25 , _lDAtemp26 , _lDAtemp27 , _lDAtemp28 , _lDAtemp29 , _lDAtemp30 , _lDAtemp31 , _lDAtemp32 , _lDAtemp33 , _lDAtemp34 , _ls ;
- _lDAtemp1 = _lDAstart1 + 4000.0 ;
-   _lDAtemp2 = _lDAtemp1 + 4000.0 ;
-   _lDAtemp3 = _lDAtemp2 + 4000.0 ;
-   _lDAtemp4 = _lDAtemp3 + 4000.0 ;
-   _lDAtemp5 = _lDAtemp4 + 4000.0 ;
-   _lDAtemp6 = _lDAtemp5 + 4000.0 ;
-   _lDAtemp7 = _lDAtemp6 + 4000.0 ;
-   _lDAtemp8 = _lDAtemp7 + 4000.0 ;
-   _lDAtemp9 = _lDAtemp8 + 4000.0 ;
-   _lDAtemp10 = _lDAtemp9 + 4000.0 ;
-   _lDAtemp11 = _lDAtemp10 + 4000.0 ;
-   _lDAtemp12 = _lDAtemp11 + 4000.0 ;
-   _lDAtemp13 = _lDAtemp12 + 4000.0 ;
-   _lDAtemp14 = _lDAtemp13 + 4000.0 ;
-   _lDAtemp15 = _lDAtemp14 + 4000.0 + 100000.0 ;
-   _lDAtemp16 = _lDAtemp15 + 4000.0 ;
-   _lDAtemp17 = _lDAtemp16 + 4000.0 ;
-   _lDAtemp18 = _lDAtemp17 + 4000.0 ;
-   _lDAtemp19 = _lDAtemp18 + 4000.0 ;
-   _lDAtemp20 = _lDAtemp19 + 4000.0 ;
-   _lDAtemp21 = _lDAtemp20 + 4000.0 ;
-   _lDAtemp22 = _lDAtemp21 + 4000.0 ;
-   _lDAtemp23 = _lDAtemp22 + 4000.0 ;
-   _lDAtemp24 = _lDAtemp23 + 4000.0 ;
-   _lDAtemp25 = _lDAtemp24 + 4000.0 ;
-   _lDAtemp26 = _lDAtemp25 + 4000.0 ;
-   _lDAtemp27 = _lDAtemp26 + 4000.0 ;
-   _lDAtemp28 = _lDAtemp27 + 4000.0 ;
-   _lDAtemp29 = _lDAtemp28 + 4000.0 ;
-   _lDAtemp30 = _lDAtemp29 + 4000.0 ;
-   _lDAtemp31 = _lDAtemp30 + 4000.0 ;
-   _lDAtemp32 = _lDAtemp31 + 4000.0 ;
-   _lDAtemp33 = _lDAtemp32 + 4000.0 ;
-   _lDAtemp34 = _lDAtemp33 + 4000.0 ;
-   if ( t <= _lDAstart1 ) {
-     _lDA1 = 1.0 ;
-     }
-   else if ( t >= _lDAstart1  && t <= _lDAstop1 ) {
-     _lDA1 = DA_t1 ;
-     }
-   else if ( t > _lDAstop1  && t < _lDAtemp1 ) {
-     _lDA1 = 1.0 + ( DA_t1 - 1.0 ) * exp ( - Beta1 * ( t - _lDAstop1 ) ) ;
-     }
-   else if ( t >= _lDAtemp1  && t <= _lDAtemp1 + 500.0 ) {
-     _lDA1 = DA_t1 ;
-     }
-   else if ( t > _lDAtemp1 + 500.0  && t < _lDAtemp2 ) {
-     _lDA1 = 1.0 + ( DA_t1 - 1.0 ) * exp ( - Beta1 * ( t - ( _lDAtemp1 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp2  && t <= _lDAtemp2 + 500.0 ) {
-     _lDA1 = DA_t1 ;
-     }
-   else if ( t > _lDAtemp2 + 500.0  && t < _lDAtemp3 ) {
-     _lDA1 = 1.0 + ( DA_t1 - 1.0 ) * exp ( - Beta1 * ( t - ( _lDAtemp2 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp3  && t <= _lDAtemp3 + 500.0 ) {
-     _lDA1 = DA_t1 ;
-     }
-   else if ( t > _lDAtemp3 + 500.0  && t < _lDAtemp4 ) {
-     _lDA1 = 1.0 + ( DA_t1 - 1.0 ) * exp ( - Beta1 * ( t - ( _lDAtemp3 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp4  && t <= _lDAtemp4 + 500.0 ) {
-     _lDA1 = DA_t1 ;
-     }
-   else if ( t > _lDAtemp4 + 500.0  && t < _lDAtemp5 ) {
-     _lDA1 = 1.0 + ( DA_t1 - 1.0 ) * exp ( - Beta1 * ( t - ( _lDAtemp4 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp5  && t <= _lDAtemp5 + 500.0 ) {
-     _lDA1 = DA_t1 ;
-     }
-   else if ( t > _lDAtemp5 + 500.0  && t < _lDAtemp6 ) {
-     _lDA1 = 1.0 + ( DA_t1 - 1.0 ) * exp ( - Beta1 * ( t - ( _lDAtemp5 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp6  && t <= _lDAtemp6 + 500.0 ) {
-     _lDA1 = DA_t1 ;
-     }
-   else if ( t > _lDAtemp6 + 500.0  && t < _lDAtemp7 ) {
-     _lDA1 = 1.0 + ( DA_t1 - 1.0 ) * exp ( - Beta1 * ( t - ( _lDAtemp6 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp7  && t <= _lDAtemp7 + 500.0 ) {
-     _lDA1 = DA_t1 ;
-     }
-   else if ( t > _lDAtemp7 + 500.0  && t < _lDAtemp8 ) {
-     _lDA1 = 1.0 + ( DA_t1 - 1.0 ) * exp ( - Beta1 * ( t - ( _lDAtemp7 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp8  && t <= _lDAtemp8 + 500.0 ) {
-     _lDA1 = DA_t1 ;
-     }
-   else if ( t > _lDAtemp8 + 500.0  && t < _lDAtemp9 ) {
-     _lDA1 = 1.0 + ( DA_t1 - 1.0 ) * exp ( - Beta1 * ( t - ( _lDAtemp8 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp9  && t <= _lDAtemp9 + 500.0 ) {
-     _lDA1 = DA_t2 ;
-     }
-   else if ( t > _lDAtemp9 + 500.0  && t < _lDAtemp10 ) {
-     _lDA1 = 1.0 + ( DA_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lDAtemp9 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp10  && t <= _lDAtemp10 + 500.0 ) {
-     _lDA1 = DA_t2 ;
-     }
-   else if ( t > _lDAtemp10 + 500.0  && t < _lDAtemp11 ) {
-     _lDA1 = 1.0 + ( DA_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lDAtemp10 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp11  && t <= _lDAtemp11 + 500.0 ) {
-     _lDA1 = DA_t2 ;
-     }
-   else if ( t > _lDAtemp11 + 500.0  && t < _lDAtemp12 ) {
-     _lDA1 = 1.0 + ( DA_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lDAtemp11 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp12  && t <= _lDAtemp12 + 500.0 ) {
-     _lDA1 = DA_t2 ;
-     }
-   else if ( t > _lDAtemp12 + 500.0  && t < _lDAtemp13 ) {
-     _lDA1 = 1.0 + ( DA_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lDAtemp12 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp13  && t <= _lDAtemp13 + 500.0 ) {
-     _lDA1 = DA_t2 ;
-     }
-   else if ( t > _lDAtemp13 + 500.0  && t < _lDAtemp14 ) {
-     _lDA1 = 1.0 + ( DA_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lDAtemp13 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp14  && t <= _lDAtemp14 + 500.0 ) {
-     _lDA1 = DA_t2 ;
-     }
-   else if ( t > _lDAtemp14 + 500.0  && t < _lDAtemp15 ) {
-     _lDA1 = 1.0 + ( DA_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lDAtemp14 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp15  && t <= _lDAtemp15 + 500.0 ) {
-     _lDA1 = DA_t2 ;
-     }
-   else if ( t > _lDAtemp15 + 500.0  && t < _lDAtemp16 ) {
-     _lDA1 = 1.0 + ( DA_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lDAtemp15 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp16  && t <= _lDAtemp16 + 500.0 ) {
-     _lDA1 = DA_t2 ;
-     }
-   else if ( t > _lDAtemp16 + 500.0  && t < _lDAtemp17 ) {
-     _lDA1 = 1.0 + ( DA_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lDAtemp16 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp17  && t <= _lDAtemp17 + 500.0 ) {
-     _lDA1 = DA_t2 ;
-     }
-   else if ( t > _lDAtemp17 + 500.0  && t < _lDAtemp18 ) {
-     _lDA1 = 1.0 + ( DA_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lDAtemp17 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp18  && t <= _lDAtemp18 + 500.0 ) {
-     _lDA1 = DA_t2 ;
-     }
-   else if ( t > _lDAtemp18 + 500.0  && t < _lDAtemp19 ) {
-     _lDA1 = 1.0 + ( DA_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lDAtemp18 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp19  && t <= _lDAtemp19 + 500.0 ) {
-     _lDA1 = DA_t3 ;
-     }
-   else if ( t > _lDAtemp19 + 500.0  && t < _lDAtemp20 ) {
-     _lDA1 = 1.0 + ( DA_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lDAtemp19 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp20  && t <= _lDAtemp20 + 500.0 ) {
-     _lDA1 = DA_t3 ;
-     }
-   else if ( t > _lDAtemp20 + 500.0  && t < _lDAtemp21 ) {
-     _lDA1 = 1.0 + ( DA_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lDAtemp20 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp21  && t <= _lDAtemp21 + 500.0 ) {
-     _lDA1 = DA_t3 ;
-     }
-   else if ( t > _lDAtemp21 + 500.0  && t < _lDAtemp22 ) {
-     _lDA1 = 1.0 + ( DA_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lDAtemp21 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp22  && t <= _lDAtemp22 + 500.0 ) {
-     _lDA1 = DA_t3 ;
-     }
-   else if ( t > _lDAtemp22 + 500.0  && t < _lDAtemp23 ) {
-     _lDA1 = 1.0 + ( DA_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lDAtemp22 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp23  && t <= _lDAtemp23 + 500.0 ) {
-     _lDA1 = DA_t3 ;
-     }
-   else if ( t > _lDAtemp23 + 500.0  && t < _lDAtemp24 ) {
-     _lDA1 = 1.0 + ( DA_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lDAtemp23 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp24  && t <= _lDAtemp24 + 500.0 ) {
-     _lDA1 = DA_t3 ;
-     }
-   else if ( t > _lDAtemp24 + 500.0  && t < _lDAtemp25 ) {
-     _lDA1 = 1.0 + ( DA_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lDAtemp24 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp25  && t <= _lDAtemp25 + 500.0 ) {
-     _lDA1 = DA_t3 ;
-     }
-   else if ( t > _lDAtemp25 + 500.0  && t < _lDAtemp26 ) {
-     _lDA1 = 1.0 + ( DA_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lDAtemp25 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp26  && t <= _lDAtemp26 + 500.0 ) {
-     _lDA1 = DA_t3 ;
-     }
-   else if ( t > _lDAtemp26 + 500.0  && t < _lDAtemp27 ) {
-     _lDA1 = 1.0 + ( DA_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lDAtemp26 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp27  && t <= _lDAtemp27 + 500.0 ) {
-     _lDA1 = DA_t3 ;
-     }
-   else if ( t > _lDAtemp27 + 500.0  && t < _lDAtemp28 ) {
-     _lDA1 = 1.0 + ( DA_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lDAtemp27 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp28  && t <= _lDAtemp28 + 500.0 ) {
-     _lDA1 = DA_t3 ;
-     }
-   else if ( t > _lDAtemp28 + 500.0  && t < _lDAtemp29 ) {
-     _lDA1 = 1.0 + ( DA_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lDAtemp28 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp29  && t <= _lDAtemp29 + 500.0 ) {
-     _lDA1 = DA_t3 ;
-     }
-   else if ( t > _lDAtemp29 + 500.0  && t < _lDAtemp30 ) {
-     _lDA1 = 1.0 + ( DA_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lDAtemp29 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp30  && t <= _lDAtemp30 + 500.0 ) {
-     _lDA1 = DA_t3 ;
-     }
-   else if ( t > _lDAtemp30 + 500.0  && t < _lDAtemp31 ) {
-     _lDA1 = 1.0 + ( DA_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lDAtemp30 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp31  && t <= _lDAtemp31 + 500.0 ) {
-     _lDA1 = DA_t3 ;
-     }
-   else if ( t > _lDAtemp31 + 500.0  && t < _lDAtemp32 ) {
-     _lDA1 = 1.0 + ( DA_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lDAtemp31 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp32  && t <= _lDAtemp32 + 500.0 ) {
-     _lDA1 = DA_t3 ;
-     }
-   else if ( t > _lDAtemp32 + 500.0  && t < _lDAtemp33 ) {
-     _lDA1 = 1.0 + ( DA_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lDAtemp32 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp33  && t <= _lDAtemp33 + 500.0 ) {
-     _lDA1 = DA_t3 ;
-     }
-   else if ( t > _lDAtemp33 + 500.0  && t < _lDAtemp34 ) {
-     _lDA1 = 1.0 + ( DA_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lDAtemp33 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDAtemp34  && t <= _lDAtemp34 + 500.0 ) {
-     _lDA1 = DA_t3 ;
-     }
-   else {
-     _lDA1 = 1.0 ;
-     }
-   
-return _lDA1;
- }
- 
-static double _hoc_DA1(void* _vptr) {
- double _r;
-    _hoc_setdata(_vptr);
- _r =  DA1 (  *getarg(1) , *getarg(2) );
- return(_r);
-}
- 
-double DA2 (  double _lDAstart2 , double _lDAstop2 ) {
-   double _lDA2;
- double _lDA2temp1 , _lDA2temp2 , _lDA2temp3 , _lDA2temp4 , _lDA2temp5 , _lDA2temp6 , _lDA2temp7 , _lDA2temp8 , _lDA2temp9 , _lDA2temp10 , _lDA2temp11 , _lDA2temp12 , _lDA2temp13 , _lDA2temp14 , _lDA2temp15 , _lDA2temp16 , _ls ;
- _lDA2temp1 = _lDAstart2 + 4000.0 ;
-   _lDA2temp2 = _lDA2temp1 + 4000.0 ;
-   _lDA2temp3 = _lDA2temp2 + 4000.0 ;
-   _lDA2temp4 = _lDA2temp3 + 4000.0 ;
-   _lDA2temp5 = _lDA2temp4 + 4000.0 ;
-   _lDA2temp6 = _lDA2temp5 + 4000.0 ;
-   _lDA2temp7 = _lDA2temp6 + 4000.0 ;
-   _lDA2temp8 = _lDA2temp7 + 4000.0 ;
-   _lDA2temp9 = _lDA2temp8 + 4000.0 ;
-   _lDA2temp10 = _lDA2temp9 + 4000.0 ;
-   _lDA2temp11 = _lDA2temp10 + 4000.0 ;
-   _lDA2temp12 = _lDA2temp11 + 4000.0 ;
-   _lDA2temp13 = _lDA2temp12 + 4000.0 ;
-   _lDA2temp14 = _lDA2temp13 + 4000.0 ;
-   _lDA2temp15 = _lDA2temp14 + 4000.0 ;
-   if ( t <= _lDAstart2 ) {
-     _lDA2 = 1.0 ;
-     }
-   else if ( t >= _lDAstart2  && t <= _lDAstop2 ) {
-     _lDA2 = DA_S ;
-     }
-   else if ( t > _lDAstop2  && t < _lDA2temp1 ) {
-     _lDA2 = 1.0 + ( DA_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lDAstop2 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lDA2temp1  && t <= _lDA2temp1 + 100.0 ) {
-     _lDA2 = DA_S ;
-     }
-   else if ( t > _lDA2temp1 + 100.0  && t < _lDA2temp2 ) {
-     _lDA2 = 1.0 + ( DA_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lDA2temp1 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lDA2temp2  && t <= _lDA2temp2 + 100.0 ) {
-     _lDA2 = DA_S ;
-     }
-   else if ( t > _lDA2temp2 + 100.0  && t < _lDA2temp3 ) {
-     _lDA2 = 1.0 + ( DA_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lDA2temp2 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lDA2temp3  && t <= _lDA2temp3 + 100.0 ) {
-     _lDA2 = DA_S ;
-     }
-   else if ( t > _lDA2temp3 + 100.0  && t < _lDA2temp4 ) {
-     _lDA2 = 1.0 + ( DA_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lDA2temp3 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lDA2temp4  && t <= _lDA2temp4 + 100.0 ) {
-     _lDA2 = DA_S ;
-     }
-   else if ( t > _lDA2temp4 + 100.0  && t < _lDA2temp5 ) {
-     _lDA2 = 1.0 + ( DA_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lDA2temp4 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lDA2temp5  && t <= _lDA2temp5 + 100.0 ) {
-     _lDA2 = DA_S ;
-     }
-   else if ( t > _lDA2temp5 + 100.0  && t < _lDA2temp6 ) {
-     _lDA2 = 1.0 + ( DA_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lDA2temp5 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lDA2temp6  && t <= _lDA2temp6 + 100.0 ) {
-     _lDA2 = DA_S ;
-     }
-   else if ( t > _lDA2temp6 + 100.0  && t < _lDA2temp7 ) {
-     _lDA2 = 1.0 + ( DA_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lDA2temp6 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lDA2temp7  && t <= _lDA2temp7 + 100.0 ) {
-     _lDA2 = DA_S ;
-     }
-   else if ( t > _lDA2temp7 + 100.0  && t < _lDA2temp8 ) {
-     _lDA2 = 1.0 + ( DA_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lDA2temp7 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lDA2temp8  && t <= _lDA2temp8 + 100.0 ) {
-     _lDA2 = DA_S ;
-     }
-   else if ( t > _lDA2temp8 + 100.0  && t < _lDA2temp9 ) {
-     _lDA2 = 1.0 + ( DA_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lDA2temp8 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lDA2temp9  && t <= _lDA2temp9 + 100.0 ) {
-     _lDA2 = DA_S ;
-     }
-   else if ( t > _lDA2temp9 + 100.0  && t < _lDA2temp10 ) {
-     _lDA2 = 1.0 + ( DA_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lDA2temp9 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lDA2temp10  && t <= _lDA2temp10 + 100.0 ) {
-     _lDA2 = DA_S ;
-     }
-   else if ( t > _lDA2temp10 + 100.0  && t < _lDA2temp11 ) {
-     _lDA2 = 1.0 + ( DA_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lDA2temp10 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lDA2temp11  && t <= _lDA2temp11 + 100.0 ) {
-     _lDA2 = DA_S ;
-     }
-   else if ( t > _lDA2temp11 + 100.0  && t < _lDA2temp12 ) {
-     _lDA2 = 1.0 + ( DA_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lDA2temp11 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lDA2temp12  && t <= _lDA2temp12 + 100.0 ) {
-     _lDA2 = DA_S ;
-     }
-   else if ( t > _lDA2temp12 + 100.0  && t < _lDA2temp13 ) {
-     _lDA2 = 1.0 + ( DA_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lDA2temp12 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lDA2temp13  && t <= _lDA2temp13 + 100.0 ) {
-     _lDA2 = DA_S ;
-     }
-   else if ( t > _lDA2temp13 + 100.0  && t < _lDA2temp14 ) {
-     _lDA2 = 1.0 + ( DA_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lDA2temp13 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lDA2temp14  && t <= _lDA2temp14 + 100.0 ) {
-     _lDA2 = DA_S ;
-     }
-   else if ( t > _lDA2temp14 + 100.0  && t < _lDA2temp15 ) {
-     _lDA2 = 1.0 + ( DA_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lDA2temp14 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lDA2temp15  && t <= _lDA2temp15 + 100.0 ) {
-     _lDA2 = DA_S ;
-     }
-   else {
-     _lDA2 = 1.0 ;
-     }
-   
-return _lDA2;
- }
- 
-static double _hoc_DA2(void* _vptr) {
- double _r;
-    _hoc_setdata(_vptr);
- _r =  DA2 (  *getarg(1) , *getarg(2) );
- return(_r);
-}
- 
-double NEn (  double _lNEstart1 , double _lNEstop1 ) {
-   double _lNEn;
- double _lNEtemp1 , _lNEtemp2 , _lNEtemp3 , _lNEtemp4 , _lNEtemp5 , _lNEtemp6 , _lNEtemp7 , _lNEtemp8 , _lNEtemp9 , _lNEtemp10 , _lNEtemp11 , _lNEtemp12 , _lNEtemp13 , _lNEtemp14 , _lNEtemp15 , _lNEtemp16 , _lNEtemp17 , _lNEtemp18 , _lNEtemp19 , _lNEtemp20 , _lNEtemp21 , _lNEtemp22 , _lNEtemp23 , _lNEtemp24 , _lNEtemp25 , _lNEtemp26 , _lNEtemp27 , _lNEtemp28 , _lNEtemp29 , _lNEtemp30 , _lNEtemp31 , _lNEtemp32 , _lNEtemp33 , _lNEtemp34 , _ls ;
- _lNEtemp1 = _lNEstart1 + 4000.0 ;
-   _lNEtemp2 = _lNEtemp1 + 4000.0 ;
-   _lNEtemp3 = _lNEtemp2 + 4000.0 ;
-   _lNEtemp4 = _lNEtemp3 + 4000.0 ;
-   _lNEtemp5 = _lNEtemp4 + 4000.0 ;
-   _lNEtemp6 = _lNEtemp5 + 4000.0 ;
-   _lNEtemp7 = _lNEtemp6 + 4000.0 ;
-   _lNEtemp8 = _lNEtemp7 + 4000.0 ;
-   _lNEtemp9 = _lNEtemp8 + 4000.0 ;
-   _lNEtemp10 = _lNEtemp9 + 4000.0 ;
-   _lNEtemp11 = _lNEtemp10 + 4000.0 ;
-   _lNEtemp12 = _lNEtemp11 + 4000.0 ;
-   _lNEtemp13 = _lNEtemp12 + 4000.0 ;
-   _lNEtemp14 = _lNEtemp13 + 4000.0 ;
-   _lNEtemp15 = _lNEtemp14 + 4000.0 + 100000.0 ;
-   _lNEtemp16 = _lNEtemp15 + 4000.0 ;
-   _lNEtemp17 = _lNEtemp16 + 4000.0 ;
-   _lNEtemp18 = _lNEtemp17 + 4000.0 ;
-   _lNEtemp19 = _lNEtemp18 + 4000.0 ;
-   _lNEtemp20 = _lNEtemp19 + 4000.0 ;
-   _lNEtemp21 = _lNEtemp20 + 4000.0 ;
-   _lNEtemp22 = _lNEtemp21 + 4000.0 ;
-   _lNEtemp23 = _lNEtemp22 + 4000.0 ;
-   _lNEtemp24 = _lNEtemp23 + 4000.0 ;
-   _lNEtemp25 = _lNEtemp24 + 4000.0 ;
-   _lNEtemp26 = _lNEtemp25 + 4000.0 ;
-   _lNEtemp27 = _lNEtemp26 + 4000.0 ;
-   _lNEtemp28 = _lNEtemp27 + 4000.0 ;
-   _lNEtemp29 = _lNEtemp28 + 4000.0 ;
-   _lNEtemp30 = _lNEtemp29 + 4000.0 ;
-   _lNEtemp31 = _lNEtemp30 + 4000.0 ;
-   _lNEtemp32 = _lNEtemp31 + 4000.0 ;
-   _lNEtemp33 = _lNEtemp32 + 4000.0 ;
-   _lNEtemp34 = _lNEtemp33 + 4000.0 ;
-   if ( t <= _lNEstart1 ) {
-     _lNEn = 1.0 ;
-     }
-   else if ( t >= _lNEstart1  && t <= _lNEstop1 ) {
-     _lNEn = NE_t1 ;
-     }
-   else if ( t > _lNEstop1  && t < _lNEtemp1 ) {
-     _lNEn = 1.0 + ( NE_t1 - 1.0 ) * exp ( - Beta1 * ( t - _lNEstop1 ) ) ;
-     }
-   else if ( t >= _lNEtemp1  && t <= _lNEtemp1 + 500.0 ) {
-     _lNEn = NE_t1 ;
-     }
-   else if ( t > _lNEtemp1 + 500.0  && t < _lNEtemp2 ) {
-     _lNEn = 1.0 + ( NE_t1 - 1.0 ) * exp ( - Beta1 * ( t - _lNEstop1 ) ) ;
-     }
-   else if ( t >= _lNEtemp2  && t <= _lNEtemp2 + 500.0 ) {
-     _lNEn = NE_t1 ;
-     }
-   else if ( t > _lNEtemp2 + 500.0  && t < _lNEtemp3 ) {
-     _lNEn = 1.0 + ( NE_t1 - 1.0 ) * exp ( - Beta1 * ( t - ( _lNEtemp2 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp3  && t <= _lNEtemp3 + 500.0 ) {
-     _lNEn = NE_t1 ;
-     }
-   else if ( t > _lNEtemp3 + 500.0  && t < _lNEtemp4 ) {
-     _lNEn = 1.0 + ( NE_t1 - 1.0 ) * exp ( - Beta1 * ( t - ( _lNEtemp3 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp4  && t <= _lNEtemp4 + 500.0 ) {
-     _lNEn = NE_t1 ;
-     }
-   else if ( t > _lNEtemp4 + 500.0  && t < _lNEtemp5 ) {
-     _lNEn = 1.0 + ( NE_t1 - 1.0 ) * exp ( - Beta1 * ( t - ( _lNEtemp4 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp5  && t <= _lNEtemp5 + 500.0 ) {
-     _lNEn = NE_t1 ;
-     }
-   else if ( t > _lNEtemp5 + 500.0  && t < _lNEtemp6 ) {
-     _lNEn = 1.0 + ( NE_t1 - 1.0 ) * exp ( - Beta1 * ( t - ( _lNEtemp5 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp6  && t <= _lNEtemp6 + 500.0 ) {
-     _lNEn = NE_t1 ;
-     }
-   else if ( t > _lNEtemp6 + 500.0  && t < _lNEtemp7 ) {
-     _lNEn = 1.0 + ( NE_t1 - 1.0 ) * exp ( - Beta1 * ( t - ( _lNEtemp6 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp7  && t <= _lNEtemp7 + 500.0 ) {
-     _lNEn = NE_t2 ;
-     }
-   else if ( t > _lNEtemp7 + 500.0  && t < _lNEtemp8 ) {
-     _lNEn = 1.0 + ( NE_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEtemp7 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp8  && t <= _lNEtemp8 + 500.0 ) {
-     _lNEn = NE_t2 ;
-     }
-   else if ( t > _lNEtemp8 + 500.0  && t < _lNEtemp9 ) {
-     _lNEn = 1.0 + ( NE_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEtemp8 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp9  && t <= _lNEtemp9 + 500.0 ) {
-     _lNEn = NE_t2 ;
-     }
-   else if ( t > _lNEtemp9 + 500.0  && t < _lNEtemp10 ) {
-     _lNEn = 1.0 + ( NE_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEtemp9 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp10  && t <= _lNEtemp10 + 500.0 ) {
-     _lNEn = NE_t2 ;
-     }
-   else if ( t > _lNEtemp10 + 500.0  && t < _lNEtemp11 ) {
-     _lNEn = 1.0 + ( NE_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEtemp10 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp11  && t <= _lNEtemp11 + 500.0 ) {
-     _lNEn = NE_t2 ;
-     }
-   else if ( t > _lNEtemp11 + 500.0  && t < _lNEtemp12 ) {
-     _lNEn = 1.0 + ( NE_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEtemp11 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp12  && t <= _lNEtemp12 + 500.0 ) {
-     _lNEn = NE_t2 ;
-     }
-   else if ( t > _lNEtemp12 + 500.0  && t < _lNEtemp13 ) {
-     _lNEn = 1.0 + ( NE_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEtemp12 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp13  && t <= _lNEtemp13 + 500.0 ) {
-     _lNEn = NE_t2 ;
-     }
-   else if ( t > _lNEtemp13 + 500.0  && t < _lNEtemp14 ) {
-     _lNEn = 1.0 + ( NE_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEtemp13 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp14  && t <= _lNEtemp14 + 500.0 ) {
-     _lNEn = NE_t2 ;
-     }
-   else if ( t > _lNEtemp14 + 500.0  && t < _lNEtemp15 ) {
-     _lNEn = 1.0 + ( NE_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEtemp14 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp15  && t <= _lNEtemp15 + 500.0 ) {
-     _lNEn = NE_t2 ;
-     }
-   else if ( t > _lNEtemp15 + 500.0  && t < _lNEtemp16 ) {
-     _lNEn = 1.0 + ( NE_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEtemp15 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp16  && t <= _lNEtemp16 + 500.0 ) {
-     _lNEn = NE_t2 ;
-     }
-   else if ( t > _lNEtemp16 + 500.0  && t < _lNEtemp17 ) {
-     _lNEn = 1.0 + ( NE_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEtemp16 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp17  && t <= _lNEtemp17 + 500.0 ) {
-     _lNEn = NE_t2 ;
-     }
-   else if ( t > _lNEtemp17 + 500.0  && t < _lNEtemp18 ) {
-     _lNEn = 1.0 + ( NE_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEtemp17 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp18  && t <= _lNEtemp18 + 500.0 ) {
-     _lNEn = NE_t2 ;
-     }
-   else if ( t > _lNEtemp18 + 500.0  && t < _lNEtemp19 ) {
-     _lNEn = 1.0 + ( NE_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEtemp18 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp19  && t <= _lNEtemp19 + 500.0 ) {
-     _lNEn = NE_t3 ;
-     }
-   else if ( t > _lNEtemp19 + 500.0  && t < _lNEtemp20 ) {
-     _lNEn = 1.0 + ( NE_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEtemp19 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp20  && t <= _lNEtemp20 + 500.0 ) {
-     _lNEn = NE_t3 ;
-     }
-   else if ( t > _lNEtemp20 + 500.0  && t < _lNEtemp21 ) {
-     _lNEn = 1.0 + ( NE_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEtemp20 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp21  && t <= _lNEtemp21 + 500.0 ) {
-     _lNEn = NE_t3 ;
-     }
-   else if ( t > _lNEtemp21 + 500.0  && t < _lNEtemp22 ) {
-     _lNEn = 1.0 + ( NE_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEtemp21 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp22  && t <= _lNEtemp22 + 500.0 ) {
-     _lNEn = NE_t3 ;
-     }
-   else if ( t > _lNEtemp22 + 500.0  && t < _lNEtemp23 ) {
-     _lNEn = 1.0 + ( NE_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEtemp22 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp23  && t <= _lNEtemp23 + 500.0 ) {
-     _lNEn = NE_t3 ;
-     }
-   else if ( t > _lNEtemp23 + 500.0  && t < _lNEtemp24 ) {
-     _lNEn = 1.0 + ( NE_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEtemp23 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp24  && t <= _lNEtemp24 + 500.0 ) {
-     _lNEn = NE_t3 ;
-     }
-   else if ( t > _lNEtemp24 + 500.0  && t < _lNEtemp25 ) {
-     _lNEn = 1.0 + ( NE_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEtemp24 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp25  && t <= _lNEtemp25 + 500.0 ) {
-     _lNEn = NE_t3 ;
-     }
-   else if ( t > _lNEtemp25 + 500.0  && t < _lNEtemp26 ) {
-     _lNEn = 1.0 + ( NE_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEtemp25 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp26  && t <= _lNEtemp26 + 500.0 ) {
-     _lNEn = NE_t3 ;
-     }
-   else if ( t > _lNEtemp26 + 500.0  && t < _lNEtemp27 ) {
-     _lNEn = 1.0 + ( NE_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEtemp26 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp27  && t <= _lNEtemp27 + 500.0 ) {
-     _lNEn = NE_t3 ;
-     }
-   else if ( t > _lNEtemp27 + 500.0  && t < _lNEtemp28 ) {
-     _lNEn = 1.0 + ( NE_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEtemp27 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp28  && t <= _lNEtemp28 + 500.0 ) {
-     _lNEn = NE_t3 ;
-     }
-   else if ( t > _lNEtemp28 + 500.0  && t < _lNEtemp29 ) {
-     _lNEn = 1.0 + ( NE_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEtemp28 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp29  && t <= _lNEtemp29 + 500.0 ) {
-     _lNEn = NE_t3 ;
-     }
-   else if ( t > _lNEtemp29 + 500.0  && t < _lNEtemp30 ) {
-     _lNEn = 1.0 + ( NE_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEtemp29 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp30  && t <= _lNEtemp30 + 500.0 ) {
-     _lNEn = NE_t3 ;
-     }
-   else if ( t > _lNEtemp30 + 500.0  && t < _lNEtemp31 ) {
-     _lNEn = 1.0 + ( NE_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEtemp30 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp31  && t <= _lNEtemp31 + 500.0 ) {
-     _lNEn = NE_t3 ;
-     }
-   else if ( t > _lNEtemp31 + 500.0  && t < _lNEtemp32 ) {
-     _lNEn = 1.0 + ( NE_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEtemp31 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp32  && t <= _lNEtemp32 + 500.0 ) {
-     _lNEn = NE_t3 ;
-     }
-   else if ( t > _lNEtemp32 + 500.0  && t < _lNEtemp33 ) {
-     _lNEn = 1.0 + ( NE_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEtemp32 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp33  && t <= _lNEtemp33 + 500.0 ) {
-     _lNEn = NE_t3 ;
-     }
-   else if ( t > _lNEtemp33 + 500.0  && t < _lNEtemp34 ) {
-     _lNEn = 1.0 + ( NE_t2 - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEtemp33 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNEtemp34  && t <= _lNEtemp34 + 500.0 ) {
-     _lNEn = NE_t3 ;
-     }
-   else {
-     _lNEn = 1.0 ;
-     }
-   
-return _lNEn;
- }
- 
-static double _hoc_NEn(void* _vptr) {
- double _r;
-    _hoc_setdata(_vptr);
- _r =  NEn (  *getarg(1) , *getarg(2) );
- return(_r);
-}
- 
-double NE2 (  double _lNEstart2 , double _lNEstop2 ) {
-   double _lNE2;
- double _lNE2temp1 , _lNE2temp2 , _lNE2temp3 , _lNE2temp4 , _lNE2temp5 , _lNE2temp6 , _lNE2temp7 , _lNE2temp8 , _lNE2temp9 , _lNE2temp10 , _lNE2temp11 , _lNE2temp12 , _lNE2temp13 , _lNE2temp14 , _lNE2temp15 , _lNE2temp16 , _ls ;
- _lNE2temp1 = _lNEstart2 + 4000.0 ;
-   _lNE2temp2 = _lNE2temp1 + 4000.0 ;
-   _lNE2temp3 = _lNE2temp2 + 4000.0 ;
-   _lNE2temp4 = _lNE2temp3 + 4000.0 ;
-   _lNE2temp5 = _lNE2temp4 + 4000.0 ;
-   _lNE2temp6 = _lNE2temp5 + 4000.0 ;
-   _lNE2temp7 = _lNE2temp6 + 4000.0 ;
-   _lNE2temp8 = _lNE2temp7 + 4000.0 ;
-   _lNE2temp9 = _lNE2temp8 + 4000.0 ;
-   _lNE2temp10 = _lNE2temp9 + 4000.0 ;
-   _lNE2temp11 = _lNE2temp10 + 4000.0 ;
-   _lNE2temp12 = _lNE2temp11 + 4000.0 ;
-   _lNE2temp13 = _lNE2temp12 + 4000.0 ;
-   _lNE2temp14 = _lNE2temp13 + 4000.0 ;
-   _lNE2temp15 = _lNE2temp14 + 4000.0 ;
-   if ( t <= _lNEstart2 ) {
-     _lNE2 = 1.0 ;
-     }
-   else if ( t >= _lNEstart2  && t <= _lNEstop2 ) {
-     _lNE2 = NE_S ;
-     }
-   else if ( t > _lNEstop2  && t < _lNE2temp1 ) {
-     _lNE2 = 1.0 + ( NE_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lNEstop2 + 500.0 ) ) ) ;
-     }
-   else if ( t >= _lNE2temp1  && t <= _lNE2temp1 + 100.0 ) {
-     _lNE2 = NE_S ;
-     }
-   else if ( t > _lNE2temp1 + 100.0  && t < _lNE2temp2 ) {
-     _lNE2 = 1.0 + ( NE_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lNE2temp1 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lNE2temp2  && t <= _lNE2temp2 + 100.0 ) {
-     _lNE2 = NE_S ;
-     }
-   else if ( t > _lNE2temp2 + 100.0  && t < _lNE2temp3 ) {
-     _lNE2 = 1.0 + ( NE_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lNE2temp2 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lNE2temp3  && t <= _lNE2temp3 + 100.0 ) {
-     _lNE2 = NE_S ;
-     }
-   else if ( t > _lNE2temp3 + 100.0  && t < _lNE2temp4 ) {
-     _lNE2 = 1.0 + ( NE_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lNE2temp3 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lNE2temp4  && t <= _lNE2temp4 + 100.0 ) {
-     _lNE2 = NE_S ;
-     }
-   else if ( t > _lNE2temp4 + 100.0  && t < _lNE2temp5 ) {
-     _lNE2 = 1.0 + ( NE_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lNE2temp4 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lNE2temp5  && t <= _lNE2temp5 + 100.0 ) {
-     _lNE2 = NE_S ;
-     }
-   else if ( t > _lNE2temp5 + 100.0  && t < _lNE2temp6 ) {
-     _lNE2 = 1.0 + ( NE_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lNE2temp5 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lNE2temp6  && t <= _lNE2temp6 + 100.0 ) {
-     _lNE2 = NE_S ;
-     }
-   else if ( t > _lNE2temp6 + 100.0  && t < _lNE2temp7 ) {
-     _lNE2 = 1.0 + ( NE_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lNE2temp6 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lNE2temp7  && t <= _lNE2temp7 + 100.0 ) {
-     _lNE2 = NE_S ;
-     }
-   else if ( t > _lNE2temp7 + 100.0  && t < _lNE2temp8 ) {
-     _lNE2 = 1.0 + ( NE_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lNE2temp7 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lNE2temp8  && t <= _lNE2temp8 + 100.0 ) {
-     _lNE2 = NE_S ;
-     }
-   else if ( t > _lNE2temp8 + 100.0  && t < _lNE2temp9 ) {
-     _lNE2 = 1.0 + ( NE_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lNE2temp8 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lNE2temp9  && t <= _lNE2temp9 + 100.0 ) {
-     _lNE2 = NE_S ;
-     }
-   else if ( t > _lNE2temp9 + 100.0  && t < _lNE2temp10 ) {
-     _lNE2 = 1.0 + ( NE_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lNE2temp9 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lNE2temp10  && t <= _lNE2temp10 + 100.0 ) {
-     _lNE2 = NE_S ;
-     }
-   else if ( t > _lNE2temp10 + 100.0  && t < _lNE2temp11 ) {
-     _lNE2 = 1.0 + ( NE_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lNE2temp10 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lNE2temp11  && t <= _lNE2temp11 + 100.0 ) {
-     _lNE2 = NE_S ;
-     }
-   else if ( t > _lNE2temp11 + 100.0  && t < _lNE2temp12 ) {
-     _lNE2 = 1.0 + ( NE_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lNE2temp11 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lNE2temp12  && t <= _lNE2temp12 + 100.0 ) {
-     _lNE2 = NE_S ;
-     }
-   else if ( t > _lNE2temp12 + 100.0  && t < _lNE2temp13 ) {
-     _lNE2 = 1.0 + ( NE_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lNE2temp12 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lNE2temp13  && t <= _lNE2temp13 + 100.0 ) {
-     _lNE2 = NE_S ;
-     }
-   else if ( t > _lNE2temp13 + 100.0  && t < _lNE2temp14 ) {
-     _lNE2 = 1.0 + ( NE_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lNE2temp13 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lNE2temp14  && t <= _lNE2temp14 + 100.0 ) {
-     _lNE2 = NE_S ;
-     }
-   else if ( t > _lNE2temp14 + 100.0  && t < _lNE2temp15 ) {
-     _lNE2 = 1.0 + ( NE_S - 1.0 ) * exp ( - Beta2 * ( t - ( _lNE2temp14 + 100.0 ) ) ) ;
-     }
-   else if ( t >= _lNE2temp15  && t <= _lNE2temp15 + 100.0 ) {
-     _lNE2 = NE_S ;
-     }
-   else {
-     _lNE2 = 1.0 ;
-     }
-   
-return _lNE2;
- }
- 
-static double _hoc_NE2(void* _vptr) {
- double _r;
-    _hoc_setdata(_vptr);
- _r =  NE2 (  *getarg(1) , *getarg(2) );
- return(_r);
-}
- 
 double GAP1 (  double _lGAPstart1 , double _lGAPstop1 ) {
    double _lGAP1;
  double _ls ;
@@ -1441,7 +647,7 @@ static double _hoc_unirand(void* _vptr) {
  
 static int _ode_count(int _type){ return 3;}
  
-static void _ode_spec(_NrnThread* _nt, _Memb_list* _ml, int _type) {
+static void _ode_spec(NrnThread* _nt, _Memb_list* _ml, int _type) {
    Datum* _thread;
    Node* _nd; double _v; int _iml, _cntml;
   _cntml = _ml->_nodecount;
@@ -1468,7 +674,7 @@ static void _ode_matsol_instance1(_threadargsproto_) {
  _ode_matsol1 ();
  }
  
-static void _ode_matsol(_NrnThread* _nt, _Memb_list* _ml, int _type) {
+static void _ode_matsol(NrnThread* _nt, _Memb_list* _ml, int _type) {
    Datum* _thread;
    Node* _nd; double _v; int _iml, _cntml;
   _cntml = _ml->_nodecount;
@@ -1518,7 +724,7 @@ static void initmodel() {
 }
 }
 
-static void nrn_init(_NrnThread* _nt, _Memb_list* _ml, int _type){
+static void nrn_init(NrnThread* _nt, _Memb_list* _ml, int _type){
 Node *_nd; double _v; int* _ni; int _iml, _cntml;
 #if CACHEVEC
     _ni = _ml->_nodeindices;
@@ -1553,13 +759,13 @@ static double _nrn_current(double _v){double _current=0.;v=_v;{ {
      limitW = 1.0 ;
      }
    if ( neuroM  == 1.0 ) {
-     g_gaba = gbar_gaba * r_gaba * facfactor * DA1 ( _threadargscomma_ DAstart1 , DAstop1 ) * DA2 ( _threadargscomma_ DAstart2 , DAstop2 ) ;
+     g_gaba = gbar_gaba * r_gaba * facfactor ;
      }
    else if ( neuroM  == 2.0 ) {
-     g_gaba = gbar_gaba * r_gaba * facfactor * NEn ( _threadargscomma_ NEstart1 , NEstop1 ) * NE2 ( _threadargscomma_ NEstart2 , NEstop2 ) ;
+     g_gaba = gbar_gaba * r_gaba * facfactor ;
      }
    else if ( neuroM  == 3.0 ) {
-     g_gaba = gbar_gaba * r_gaba * facfactor * DA1 ( _threadargscomma_ DAstart1 , DAstop1 ) * DA2 ( _threadargscomma_ DAstart2 , DAstop2 ) * NEn ( _threadargscomma_ NEstart1 , NEstop1 ) * NE2 ( _threadargscomma_ NEstart2 , NEstop2 ) ;
+     g_gaba = gbar_gaba * r_gaba * facfactor ;
      }
    else {
      g_gaba = gbar_gaba * r_gaba * facfactor ;
@@ -1573,7 +779,7 @@ static double _nrn_current(double _v){double _current=0.;v=_v;{ {
 } return _current;
 }
 
-static void nrn_cur(_NrnThread* _nt, _Memb_list* _ml, int _type){
+static void nrn_cur(NrnThread* _nt, _Memb_list* _ml, int _type){
 Node *_nd; int* _ni; double _rhs, _v; int _iml, _cntml;
 #if CACHEVEC
     _ni = _ml->_nodeindices;
@@ -1609,7 +815,7 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
  
 }}
 
-static void nrn_jacob(_NrnThread* _nt, _Memb_list* _ml, int _type){
+static void nrn_jacob(NrnThread* _nt, _Memb_list* _ml, int _type){
 Node *_nd; int* _ni; int _iml, _cntml;
 #if CACHEVEC
     _ni = _ml->_nodeindices;
@@ -1629,7 +835,7 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
  
 }}
 
-static void nrn_state(_NrnThread* _nt, _Memb_list* _ml, int _type){
+static void nrn_state(NrnThread* _nt, _Memb_list* _ml, int _type){
 Node *_nd; double _v = 0.0; int* _ni; int _iml, _cntml;
 #if CACHEVEC
     _ni = _ml->_nodeindices;
@@ -1854,11 +1060,11 @@ static const char* nmodl_file_text =
   "	:}\n"
   "	 \n"
   "	    if (neuroM==1) {\n"
-  "	g_gaba = gbar_gaba*r_gaba*facfactor*DA1(DAstart1,DAstop1)*DA2(DAstart2,DAstop2)   : Dopamine effect on GABA	\n"
+  "	g_gaba = gbar_gaba*r_gaba*facfactor   : Dopamine effect on GABA	\n"
   "	} else if (neuroM==2) {\n"
-  "	g_gaba = gbar_gaba*r_gaba*facfactor*NEn(NEstart1,NEstop1)*NE2(NEstart2,NEstop2)   : Norepinephrine effect on GABA		    	\n"
+  "	g_gaba = gbar_gaba*r_gaba*facfactor   : Norepinephrine effect on GABA		    	\n"
   "	} else if (neuroM==3) {\n"
-  "	g_gaba = gbar_gaba*r_gaba*facfactor*DA1(DAstart1,DAstop1)*DA2(DAstart2,DAstop2)*NEn(NEstart1,NEstop1)*NE2(NEstart2,NEstop2)   : Dopamine & Norepinephrine effect on GABA		    \n"
+  "	g_gaba = gbar_gaba*r_gaba*facfactor  : Dopamine & Norepinephrine effect on GABA		    \n"
   "	} else {\n"
   "	g_gaba = gbar_gaba*r_gaba*facfactor\n"
   "	}\n"
@@ -1907,7 +1113,7 @@ static const char* nmodl_file_text =
   "	:printf(\"%g\\t%g\\t%g\\t%g\\n\", F, D1, D2, facfactor)\n"
   "	tsyn = t\n"
   "	\n"
-  "	facfactor = F * D1 * D2\n"
+  "	facfactor = 1:F * D1 * D2\n"
   "\n"
   "	::F = F+f  :F * f\n"
   "	\n"
@@ -1943,350 +1149,7 @@ static const char* nmodl_file_text =
   "	else if (Cacon >= threshold2) {	omega = 1/(1+50*exp(-50*(Cacon-threshold2)))}\n"
   "	else {omega = -sqrt(r*r-(Cacon-mid)*(Cacon-mid))}\n"
   "}\n"
-  "FUNCTION DA1(DAstart1 (ms), DAstop1 (ms)) {\n"
-  "	LOCAL DAtemp1, DAtemp2, DAtemp3, DAtemp4, DAtemp5, DAtemp6, DAtemp7, DAtemp8, DAtemp9, DAtemp10, DAtemp11, DAtemp12, DAtemp13, DAtemp14, DAtemp15, DAtemp16, DAtemp17, DAtemp18, DAtemp19, DAtemp20, DAtemp21, DAtemp22, DAtemp23, DAtemp24, DAtemp25, DAtemp26, DAtemp27, DAtemp28, DAtemp29, DAtemp30, DAtemp31, DAtemp32, DAtemp33, DAtemp34,s\n"
-  "	DAtemp1 = DAstart1+4000\n"
-  "	DAtemp2 = DAtemp1+4000\n"
-  "	DAtemp3 = DAtemp2+4000\n"
-  "	DAtemp4 = DAtemp3+4000\n"
-  "	DAtemp5 = DAtemp4+4000\n"
-  "	DAtemp6 = DAtemp5+4000\n"
-  "	DAtemp7 = DAtemp6+4000\n"
-  "	DAtemp8 = DAtemp7+4000\n"
-  "	DAtemp9 = DAtemp8+4000\n"
-  "	DAtemp10 = DAtemp9+4000\n"
-  "	DAtemp11 = DAtemp10+4000\n"
-  "	DAtemp12 = DAtemp11+4000\n"
-  "	DAtemp13 = DAtemp12+4000\n"
-  "	DAtemp14 = DAtemp13+4000\n"
-  "	DAtemp15 = DAtemp14 + 4000 + 100000     : 100sec Gap\n"
-  "	DAtemp16 = DAtemp15 + 4000 \n"
-  "	DAtemp17 = DAtemp16 + 4000\n"
-  "	DAtemp18 = DAtemp17 + 4000\n"
-  "	DAtemp19 = DAtemp18 + 4000 \n"
-  "	DAtemp20 = DAtemp19 + 4000\n"
-  "	DAtemp21 = DAtemp20 + 4000\n"
-  "	DAtemp22 = DAtemp21 + 4000 \n"
-  "	DAtemp23 = DAtemp22 + 4000\n"
-  "	DAtemp24 = DAtemp23 + 4000\n"
-  "	DAtemp25 = DAtemp24 + 4000 \n"
-  "	DAtemp26 = DAtemp25 + 4000\n"
-  "	DAtemp27 = DAtemp26 + 4000\n"
-  "	DAtemp28 = DAtemp27 + 4000 \n"
-  "	DAtemp29 = DAtemp28 + 4000\n"
-  "	DAtemp30 = DAtemp29 + 4000\n"
-  "	DAtemp31 = DAtemp30 + 4000 \n"
-  "	DAtemp32 = DAtemp31 + 4000\n"
-  "	DAtemp33 = DAtemp32 + 4000\n"
-  "	DAtemp34 = DAtemp33 + 4000\n"
   "\n"
-  "	if (t <= DAstart1) { DA1 = 1.0}\n"
-  "	else if (t >= DAstart1 && t <= DAstop1) {DA1 = DA_t1}					: 2nd tone in conditioning\n"
-  "		else if (t > DAstop1 && t < DAtemp1) {DA1 = 1.0 + (DA_t1-1)*exp(-Beta1*(t-DAstop1))}  			: Basal level\n"
-  "	else if (t >= DAtemp1 && t <= DAtemp1+500) {DA1=DA_t1}					: 3rd tone\n"
-  "		else if (t > DAtemp1+500 && t < DAtemp2) {DA1 = 1.0 + (DA_t1-1)*exp(-Beta1*(t-(DAtemp1+500)))} 		: Basal level\n"
-  "	else if (t >= DAtemp2 && t <= DAtemp2+500) {DA1=DA_t1}					: 4th tone\n"
-  "		else if (t > DAtemp2+500 && t < DAtemp3) {DA1 = 1.0 + (DA_t1-1)*exp(-Beta1*(t-(DAtemp2+500)))} 		: Basal level	\n"
-  "	else if (t >= DAtemp3 && t <= DAtemp3+500) {DA1=DA_t1}					: 5th tone\n"
-  "		else if (t > DAtemp3+500 && t < DAtemp4) {DA1 = 1.0 + (DA_t1-1)*exp(-Beta1*(t-(DAtemp3+500)))} 		: Basal level\n"
-  "	else if (t >= DAtemp4 && t <= DAtemp4+500) {DA1=DA_t1}					: 6th tone\n"
-  "		else if (t > DAtemp4+500 && t < DAtemp5) {DA1 = 1.0 + (DA_t1-1)*exp(-Beta1*(t-(DAtemp4+500)))} 		: Basal level\n"
-  "	else if (t >= DAtemp5 && t <= DAtemp5+500) {DA1=DA_t1}					: 7th tone\n"
-  "		else if (t > DAtemp5+500 && t < DAtemp6) {DA1 = 1.0 + (DA_t1-1)*exp(-Beta1*(t-(DAtemp5+500)))} 		: Basal level\n"
-  "	else if (t >= DAtemp6 && t <= DAtemp6+500) {DA1=DA_t1}					: 8th tone\n"
-  "		else if (t > DAtemp6+500 && t < DAtemp7) {DA1 = 1.0 + (DA_t1-1)*exp(-Beta1*(t-(DAtemp6+500)))} 		: Basal level\n"
-  "	else if (t >= DAtemp7 && t <= DAtemp7+500) {DA1=DA_t1}					: 9th tone\n"
-  "		else if (t > DAtemp7+500 && t < DAtemp8) {DA1 = 1.0 + (DA_t1-1)*exp(-Beta1*(t-(DAtemp7+500)))} 		: Basal level\n"
-  "	else if (t >= DAtemp8 && t <= DAtemp8+500) {DA1=DA_t1}					: 10th tone  \n"
-  "		else if (t > DAtemp8+500 && t < DAtemp9) {DA1 = 1.0 + (DA_t1-1)*exp(-Beta1*(t-(DAtemp8+500)))} 		: Basal level\n"
-  "	\n"
-  "	else if (t >= DAtemp9 && t <= DAtemp9+500) {DA1=DA_t2}					: 11th tone   - Second Step\n"
-  "		else if (t > DAtemp9+500 && t < DAtemp10) {DA1 = 1.0 + (DA_t2-1)*exp(-Beta2*(t-(DAtemp9+500)))}		: Basal level	\n"
-  "	else if (t >= DAtemp10 && t <= DAtemp10+500) {DA1=DA_t2}					: 12th tone\n"
-  "		else if (t > DAtemp10+500 && t < DAtemp11) {DA1 = 1.0 + (DA_t2-1)*exp(-Beta2*(t-(DAtemp10+500)))}	: Basal level\n"
-  "	else if (t >= DAtemp11 && t <= DAtemp11+500) {DA1=DA_t2}					: 13th tone\n"
-  "		else if (t > DAtemp11+500 && t < DAtemp12) {DA1 = 1.0 + (DA_t2-1)*exp(-Beta2*(t-(DAtemp11+500)))}	: Basal level\n"
-  "	else if (t >= DAtemp12 && t <= DAtemp12+500) {DA1=DA_t2}					: 14th tone \n"
-  "		else if (t > DAtemp12+500 && t < DAtemp13) {DA1 = 1.0 + (DA_t2-1)*exp(-Beta2*(t-(DAtemp12+500)))}	: Basal level\n"
-  "	else if (t >= DAtemp13 && t <= DAtemp13+500) {DA1=DA_t2}					: 15th tone\n"
-  "		else if (t > DAtemp13+500 && t < DAtemp14) {DA1 = 1.0 + (DA_t2-1)*exp(-Beta2*(t-(DAtemp13+500)))}	: Basal level\n"
-  "	else if (t >= DAtemp14 && t <= DAtemp14+500) {DA1=DA_t2}					: 16th tone\n"
-  "		else if (t > DAtemp14+500 && t < DAtemp15) {DA1 = 1.0 + (DA_t2-1)*exp(-Beta2*(t-(DAtemp14+500)))} 	: Basal level\n"
-  "	\n"
-  "	else if (t >= DAtemp15 && t <= DAtemp15+500) {DA1 = DA_t2}					: 1st tone EE\n"
-  "		else if (t > DAtemp15+500 && t < DAtemp16) {DA1 = 1.0 + (DA_t2-1)*exp(-Beta2*(t-(DAtemp15+500)))}  	: Basal level\n"
-  "	else if (t >= DAtemp16 && t <= DAtemp16+500) {DA1 = DA_t2}					: 2nd tone EE\n"
-  "		else if (t > DAtemp16+500 && t < DAtemp17) {DA1 = 1.0 + (DA_t2-1)*exp(-Beta2*(t-(DAtemp16+500)))}  	: Basal level\n"
-  "	else if (t >= DAtemp17 && t <= DAtemp17+500) {DA1 = DA_t2}					: 3rd tone EE\n"
-  "		else if (t > DAtemp17+500 && t < DAtemp18) {DA1 = 1.0 + (DA_t2-1)*exp(-Beta2*(t-(DAtemp17+500)))}  	: Basal level	\n"
-  "	else if (t >= DAtemp18 && t <= DAtemp18+500) {DA1 = DA_t2}					: 4th tone EE	\n"
-  "		else if (t > DAtemp18+500 && t < DAtemp19) {DA1 = 1.0 + (DA_t2-1)*exp(-Beta2*(t-(DAtemp18+500)))}  	: Basal level\n"
-  "	else if (t >= DAtemp19 && t <= DAtemp19+500) {DA1 = DA_t3}					: 5th tone EE\n"
-  "		else if (t > DAtemp19+500 && t < DAtemp20) {DA1 = 1.0 + (DA_t2-1)*exp(-Beta2*(t-(DAtemp19+500)))}  	: Basal level\n"
-  "	else if (t >= DAtemp20 && t <= DAtemp20+500) {DA1 = DA_t3}					: 6th tone EE\n"
-  "		else if (t > DAtemp20+500 && t < DAtemp21) {DA1 = 1.0 + (DA_t2-1)*exp(-Beta2*(t-(DAtemp20+500)))}  	: Basal level\n"
-  "	else if (t >= DAtemp21 && t <= DAtemp21+500) {DA1 = DA_t3}					: 7th tone EE\n"
-  "		else if (t > DAtemp21+500 && t < DAtemp22) {DA1 = 1.0 + (DA_t2-1)*exp(-Beta2*(t-(DAtemp21+500)))}  	: Basal level	\n"
-  "	else if (t >= DAtemp22 && t <= DAtemp22+500) {DA1 = DA_t3}					: 8th tone EE	\n"
-  "		else if (t > DAtemp22+500 && t < DAtemp23) {DA1 = 1.0 + (DA_t2-1)*exp(-Beta2*(t-(DAtemp22+500)))}  	: Basal level\n"
-  "	else if (t >= DAtemp23 && t <= DAtemp23+500) {DA1 = DA_t3}					: 9th tone EE\n"
-  "		else if (t > DAtemp23+500 && t < DAtemp24) {DA1 = 1.0 + (DA_t2-1)*exp(-Beta2*(t-(DAtemp23+500)))}  	: Basal level\n"
-  "	else if (t >= DAtemp24 && t <= DAtemp24+500) {DA1 = DA_t3}					: 10th tone EE\n"
-  "		else if (t > DAtemp24+500 && t < DAtemp25) {DA1 = 1.0 + (DA_t2-1)*exp(-Beta2*(t-(DAtemp24+500)))}  	: Basal level\n"
-  "	else if (t >= DAtemp25 && t <= DAtemp25+500) {DA1 = DA_t3}					: 11th tone EE\n"
-  "		else if (t > DAtemp25+500 && t < DAtemp26) {DA1 = 1.0 + (DA_t2-1)*exp(-Beta2*(t-(DAtemp25+500)))}  	: Basal level	\n"
-  "	else if (t >= DAtemp26 && t <= DAtemp26+500) {DA1 = DA_t3}					: 12th tone EE	\n"
-  "		else if (t > DAtemp26+500 && t < DAtemp27) {DA1 = 1.0 + (DA_t2-1)*exp(-Beta2*(t-(DAtemp26+500)))}  	: Basal level\n"
-  "	else if (t >= DAtemp27 && t <= DAtemp27+500) {DA1 = DA_t3}					: 13th tone EE\n"
-  "		else if (t > DAtemp27+500 && t < DAtemp28) {DA1 = 1.0 + (DA_t2-1)*exp(-Beta2*(t-(DAtemp27+500)))}  	: Basal level\n"
-  "	else if (t >= DAtemp28 && t <= DAtemp28+500) {DA1 = DA_t3}					: 14th tone EE\n"
-  "		else if (t > DAtemp28+500 && t < DAtemp29) {DA1 = 1.0 + (DA_t2-1)*exp(-Beta2*(t-(DAtemp28+500)))}  	: Basal level\n"
-  "	else if (t >= DAtemp29 && t <= DAtemp29+500) {DA1 = DA_t3}					: 15th tone EE\n"
-  "		else if (t > DAtemp29+500 && t < DAtemp30) {DA1 = 1.0 + (DA_t2-1)*exp(-Beta2*(t-(DAtemp29+500)))}  	: Basal level	\n"
-  "	else if (t >= DAtemp30 && t <= DAtemp30+500) {DA1 = DA_t3}					: 16th tone EE	\n"
-  "		else if (t > DAtemp30+500 && t < DAtemp31) {DA1 = 1.0 + (DA_t2-1)*exp(-Beta2*(t-(DAtemp30+500)))}  	: Basal level\n"
-  "	else if (t >= DAtemp31 && t <= DAtemp31+500) {DA1 = DA_t3}					: 17th tone EE\n"
-  "		else if (t > DAtemp31+500 && t < DAtemp32) {DA1 = 1.0 + (DA_t2-1)*exp(-Beta2*(t-(DAtemp31+500)))}  	: Basal level\n"
-  "	else if (t >= DAtemp32 && t <= DAtemp32+500) {DA1 = DA_t3}					: 18th tone EE\n"
-  "		else if (t > DAtemp32+500 && t < DAtemp33) {DA1 = 1.0 + (DA_t2-1)*exp(-Beta2*(t-(DAtemp32+500)))}  	: Basal level\n"
-  "	else if (t >= DAtemp33 && t <= DAtemp33+500) {DA1 = DA_t3}					: 19th tone EE\n"
-  "		else if (t > DAtemp33+500 && t < DAtemp34) {DA1 = 1.0 + (DA_t2-1)*exp(-Beta2*(t-(DAtemp33+500)))}  	: Basal level	\n"
-  "	else if (t >= DAtemp34 && t <= DAtemp34+500) {DA1 = DA_t3}					: 20th tone EE		\n"
-  "		else  {	DA1 = 1.0}\n"
-  "}\n"
-  "FUNCTION DA2(DAstart2 (ms), DAstop2 (ms)) {\n"
-  "	LOCAL DA2temp1, DA2temp2, DA2temp3, DA2temp4, DA2temp5, DA2temp6, DA2temp7, DA2temp8, DA2temp9, DA2temp10, DA2temp11, DA2temp12, DA2temp13, DA2temp14, DA2temp15, DA2temp16,s\n"
-  "	DA2temp1 = DAstart2 + 4000\n"
-  "	DA2temp2 = DA2temp1 + 4000\n"
-  "	DA2temp3 = DA2temp2 + 4000\n"
-  "	DA2temp4 = DA2temp3 + 4000\n"
-  "	DA2temp5 = DA2temp4 + 4000\n"
-  "	DA2temp6 = DA2temp5 + 4000\n"
-  "	DA2temp7 = DA2temp6 + 4000\n"
-  "	DA2temp8 = DA2temp7 + 4000\n"
-  "	DA2temp9 = DA2temp8 + 4000\n"
-  "	DA2temp10 = DA2temp9 + 4000\n"
-  "	DA2temp11 = DA2temp10 + 4000\n"
-  "	DA2temp12 = DA2temp11 + 4000 \n"
-  "	DA2temp13 = DA2temp12 + 4000\n"
-  "	DA2temp14 = DA2temp13 + 4000\n"
-  "	DA2temp15 = DA2temp14 + 4000\n"
-  "	\n"
-  "	if (t <= DAstart2) { DA2 = 1.0}\n"
-  "	else if (t >= DAstart2 && t <= DAstop2) {DA2 = DA_S }					: 1st shock\n"
-  "		else if (t > DAstop2 && t < DA2temp1) {DA2 = 1.0 + (DA_S-1)*exp(-Beta2*(t-(DAstop2+500)))}  					 \n"
-  "	else if (t >= DA2temp1 && t <= DA2temp1+100) {DA2=DA_S}					: 2nd shock\n"
-  "		else if (t > DA2temp1+100 && t < DA2temp2) {DA2 = 1.0 + (DA_S-1)*exp(-Beta2*(t-(DA2temp1+100)))}    				 \n"
-  "	else if (t >= DA2temp2 && t <= DA2temp2+100) {DA2=DA_S}					: 3rd shock\n"
-  "		else if (t > DA2temp2+100 && t < DA2temp3) {DA2 = 1.0 + (DA_S-1)*exp(-Beta2*(t-(DA2temp2+100)))}   				 \n"
-  "	else if (t >= DA2temp3 && t <= DA2temp3+100) {DA2=DA_S}					: 4th shock\n"
-  "		else if (t > DA2temp3+100 && t < DA2temp4) {DA2 = 1.0 + (DA_S-1)*exp(-Beta2*(t-(DA2temp3+100)))}   				 \n"
-  "	else if (t >= DA2temp4 && t <= DA2temp4+100) {DA2=DA_S}					: 5th shock\n"
-  "		else if (t > DA2temp4+100 && t < DA2temp5) {DA2 = 1.0 + (DA_S-1)*exp(-Beta2*(t-(DA2temp4+100)))}   				 \n"
-  "	else if (t >= DA2temp5 && t <= DA2temp5+100) {DA2=DA_S}					: 6th shock\n"
-  "		else if (t > DA2temp5+100 && t < DA2temp6) {DA2 = 1.0 + (DA_S-1)*exp(-Beta2*(t-(DA2temp5+100)))}    				 \n"
-  "	else if (t >= DA2temp6 && t <= DA2temp6+100) {DA2=DA_S}					: 7th shock\n"
-  "		else if (t > DA2temp6+100 && t < DA2temp7) {DA2 = 1.0 + (DA_S-1)*exp(-Beta2*(t-(DA2temp6+100)))}   				 \n"
-  "	else if (t >= DA2temp7 && t <= DA2temp7+100) {DA2=DA_S}					: 8th shock\n"
-  "		else if (t > DA2temp7+100 && t < DA2temp8) {DA2 = 1.0 + (DA_S-1)*exp(-Beta2*(t-(DA2temp7+100)))}   				    \n"
-  "	else if (t >= DA2temp8 && t <= DA2temp8+100) {DA2=DA_S }					: 9th shock\n"
-  "		else if (t > DA2temp8+100 && t < DA2temp9) {DA2 = 1.0 + (DA_S-1)*exp(-Beta2*(t-(DA2temp8+100)))}   				    \n"
-  "	else if (t >= DA2temp9 && t <= DA2temp9+100) {DA2=DA_S }					: 10th shock\n"
-  "		else if (t > DA2temp9+100 && t < DA2temp10) {DA2 = 1.0 + (DA_S-1)*exp(-Beta2*(t-(DA2temp9+100)))}   				    \n"
-  "	else if (t >= DA2temp10 && t <= DA2temp10+100) {DA2=DA_S}					: 11th shock\n"
-  "		else if (t > DA2temp10+100 && t < DA2temp11) {DA2 = 1.0 + (DA_S-1)*exp(-Beta2*(t-(DA2temp10+100)))}   				 \n"
-  "	else if (t >= DA2temp11 && t <= DA2temp11+100) {DA2=DA_S }					: 12th shock\n"
-  "		else if (t > DA2temp11+100 && t < DA2temp12) {DA2 = 1.0 + (DA_S-1)*exp(-Beta2*(t-(DA2temp11+100)))}   				 \n"
-  "	else if (t >= DA2temp12 && t <= DA2temp12+100) {DA2=DA_S}					: 13th shock\n"
-  "		else if (t > DA2temp12+100 && t < DA2temp13) {DA2 = 1.0 + (DA_S-1)*exp(-Beta2*(t-(DA2temp12+100)))}   				 \n"
-  "	else if (t >= DA2temp13 && t <= DA2temp13+100) {DA2=DA_S }					: 14th shock\n"
-  "		else if (t > DA2temp13+100 && t < DA2temp14) {DA2 = 1.0 + (DA_S-1)*exp(-Beta2*(t-(DA2temp13+100)))}   				 \n"
-  "	else if (t >= DA2temp14 && t <= DA2temp14+100) {DA2=DA_S}					: 15th shock\n"
-  "		else if (t > DA2temp14+100 && t < DA2temp15) {DA2 = 1.0 + (DA_S-1)*exp(-Beta2*(t-(DA2temp14+100)))}   				 \n"
-  "	else if (t >= DA2temp15 && t <= DA2temp15+100) {DA2=DA_S}					: 16th shock\n"
-  "		else  {	DA2 = 1.0}\n"
-  "}\n"
-  "\n"
-  "FUNCTION NEn(NEstart1 (ms), NEstop1 (ms)) {\n"
-  "	LOCAL NEtemp1, NEtemp2, NEtemp3, NEtemp4, NEtemp5, NEtemp6, NEtemp7, NEtemp8, NEtemp9, NEtemp10, NEtemp11, NEtemp12, NEtemp13, NEtemp14, NEtemp15, NEtemp16, NEtemp17, NEtemp18, NEtemp19, NEtemp20, NEtemp21, NEtemp22, NEtemp23, NEtemp24, NEtemp25, NEtemp26, NEtemp27, NEtemp28, NEtemp29, NEtemp30, NEtemp31, NEtemp32, NEtemp33, NEtemp34,s\n"
-  "	NEtemp1 = NEstart1+4000\n"
-  "	NEtemp2 = NEtemp1+4000\n"
-  "	NEtemp3 = NEtemp2+4000\n"
-  "	NEtemp4 = NEtemp3+4000\n"
-  "	NEtemp5 = NEtemp4+4000\n"
-  "	NEtemp6 = NEtemp5+4000\n"
-  "	NEtemp7 = NEtemp6+4000\n"
-  "	NEtemp8 = NEtemp7+4000\n"
-  "	NEtemp9 = NEtemp8+4000\n"
-  "	NEtemp10 = NEtemp9+4000\n"
-  "	NEtemp11 = NEtemp10+4000\n"
-  "	NEtemp12 = NEtemp11+4000\n"
-  "	NEtemp13 = NEtemp12+4000\n"
-  "	NEtemp14 = NEtemp13+4000\n"
-  "	NEtemp15 = NEtemp14 + 4000 + 100000     : 100sec Gap\n"
-  "	NEtemp16 = NEtemp15 + 4000 \n"
-  "	NEtemp17 = NEtemp16 + 4000\n"
-  "	NEtemp18 = NEtemp17 + 4000\n"
-  "	NEtemp19 = NEtemp18 + 4000 \n"
-  "	NEtemp20 = NEtemp19 + 4000\n"
-  "	NEtemp21 = NEtemp20 + 4000\n"
-  "	NEtemp22 = NEtemp21 + 4000 \n"
-  "	NEtemp23 = NEtemp22 + 4000\n"
-  "	NEtemp24 = NEtemp23 + 4000\n"
-  "	NEtemp25 = NEtemp24 + 4000 \n"
-  "	NEtemp26 = NEtemp25 + 4000\n"
-  "	NEtemp27 = NEtemp26 + 4000\n"
-  "	NEtemp28 = NEtemp27 + 4000 \n"
-  "	NEtemp29 = NEtemp28 + 4000\n"
-  "	NEtemp30 = NEtemp29 + 4000\n"
-  "	NEtemp31 = NEtemp30 + 4000 \n"
-  "	NEtemp32 = NEtemp31 + 4000\n"
-  "	NEtemp33 = NEtemp32 + 4000\n"
-  "	NEtemp34 = NEtemp33 + 4000\n"
-  "\n"
-  "	if (t <= NEstart1) { NEn = 1.0}\n"
-  "	else if (t >= NEstart1 && t <= NEstop1) {NEn = NE_t1}					: 2nd tone in early conditioning (EC)\n"
-  "		else if (t > NEstop1 && t < NEtemp1) {NEn = 1.0 + (NE_t1-1)*exp(-Beta1*(t-NEstop1))}  		: Basal level\n"
-  "	else if (t >= NEtemp1 && t <= NEtemp1+500) {NEn = NE_t1}					: 3rd tone EC\n"
-  "		else if (t > NEtemp1+500 && t < NEtemp2) {NEn = 1.0 + (NE_t1-1)*exp(-Beta1*(t-NEstop1))}  	: Basal level\n"
-  "	else if (t >= NEtemp2 && t <= NEtemp2+500) {NEn = NE_t1}					: 4th tone EC\n"
-  "		else if (t > NEtemp2+500 && t < NEtemp3) {NEn = 1.0 + (NE_t1-1)*exp(-Beta1*(t-(NEtemp2+500)))}  	: Basal level	\n"
-  "	else if (t >= NEtemp3 && t <= NEtemp3+500) {NEn = NE_t1}					: 5th tone EC\n"
-  "		else if (t > NEtemp3+500 && t < NEtemp4) {NEn = 1.0 + (NE_t1-1)*exp(-Beta1*(t-(NEtemp3+500)))}  	: Basal level\n"
-  "	else if (t >= NEtemp4 && t <= NEtemp4+500) {NEn = NE_t1}					: 6th tone EC\n"
-  "		else if (t > NEtemp4+500 && t < NEtemp5) {NEn = 1.0 + (NE_t1-1)*exp(-Beta1*(t-(NEtemp4+500)))}  		: Basal level\n"
-  "	else if (t >= NEtemp5 && t <= NEtemp5+500) {NEn = NE_t1}					: 7th tone EC\n"
-  "		else if (t > NEtemp5+500 && t < NEtemp6) {NEn = 1.0 + (NE_t1-1)*exp(-Beta1*(t-(NEtemp5+500)))}  	: Basal level\n"
-  "	else if (t >= NEtemp6 && t <= NEtemp6+500) {NEn = NE_t1}					: 8th tone EC\n"
-  "		else if (t > NEtemp6+500 && t < NEtemp7) {NEn = 1.0 + (NE_t1-1)*exp(-Beta1*(t-(NEtemp6+500)))}  	: Basal level\n"
-  "	\n"
-  "	else if (t >= NEtemp7 && t <= NEtemp7+500) {NEn = NE_t2}					: 9th tone	- Second Step late cond (LC)\n"
-  "		else if (t > NEtemp7+500 && t < NEtemp8) {NEn = 1.0 + (NE_t2-1)*exp(-Beta2*(t-(NEtemp7+500)))}  		: Basal level\n"
-  "	else if (t >= NEtemp8 && t <= NEtemp8+500) {NEn = NE_t2}					: 10th tone  LC\n"
-  "		else if (t > NEtemp8+500 && t < NEtemp9) {NEn = 1.0 + (NE_t2-1)*exp(-Beta2*(t-(NEtemp8+500)))}		: Basal level	\n"
-  "	else if (t >= NEtemp9 && t <= NEtemp9+500) {NEn = NE_t2}					: 11th tone  LC \n"
-  "		else if (t > NEtemp9+500 && t < NEtemp10) {NEn = 1.0 + (NE_t2-1)*exp(-Beta2*(t-(NEtemp9+500)))}  	: Basal level	\n"
-  "	else if (t >= NEtemp10 && t <= NEtemp10+500) {NEn = NE_t2}					: 12th tone  LC\n"
-  "		else if (t > NEtemp10+500 && t < NEtemp11) {NEn = 1.0 + (NE_t2-1)*exp(-Beta2*(t-(NEtemp10+500)))}  	: Basal level\n"
-  "	else if (t >= NEtemp11 && t <= NEtemp11+500) {NEn = NE_t2}					: 13th tone  LC\n"
-  "		else if (t > NEtemp11+500 && t < NEtemp12) {NEn = 1.0 + (NE_t2-1)*exp(-Beta2*(t-(NEtemp11+500)))}  	: Basal level\n"
-  "	else if (t >= NEtemp12 && t <= NEtemp12+500) {NEn = NE_t2}					: 14th tone  LC\n"
-  "		else if (t > NEtemp12+500 && t < NEtemp13) {NEn = 1.0 + (NE_t2-1)*exp(-Beta2*(t-(NEtemp12+500)))}  	: Basal level\n"
-  "	else if (t >= NEtemp13 && t <= NEtemp13+500) {NEn = NE_t2}					: 15th tone  LC\n"
-  "		else if (t > NEtemp13+500 && t < NEtemp14) {NEn = 1.0 + (NE_t2-1)*exp(-Beta2*(t-(NEtemp13+500)))}  	: Basal level\n"
-  "	else if (t >= NEtemp14 && t <= NEtemp14+500) {NEn = NE_t2}					: 16th tone  LC\n"
-  "		else if (t > NEtemp14+500 && t < NEtemp15) {NEn = 1.0 + (NE_t2-1)*exp(-Beta2*(t-(NEtemp14+500)))}  	: Basal level\n"
-  "	\n"
-  "	else if (t >= NEtemp15 && t <= NEtemp15+500) {NEn = NE_t2}					: 1st tone EE\n"
-  "		else if (t > NEtemp15+500 && t < NEtemp16) {NEn = 1.0 + (NE_t2-1)*exp(-Beta2*(t-(NEtemp15+500)))}  	: Basal level\n"
-  "	else if (t >= NEtemp16 && t <= NEtemp16+500) {NEn = NE_t2}					: 2nd tone EE\n"
-  "		else if (t > NEtemp16+500 && t < NEtemp17) {NEn = 1.0 + (NE_t2-1)*exp(-Beta2*(t-(NEtemp16+500)))}  	: Basal level\n"
-  "	else if (t >= NEtemp17 && t <= NEtemp17+500) {NEn = NE_t2}					: 3rd tone EE\n"
-  "		else if (t > NEtemp17+500 && t < NEtemp18) {NEn = 1.0 + (NE_t2-1)*exp(-Beta2*(t-(NEtemp17+500)))}  	: Basal level	\n"
-  "	else if (t >= NEtemp18 && t <= NEtemp18+500) {NEn = NE_t2}					: 4th tone EE	\n"
-  "		else if (t > NEtemp18+500 && t < NEtemp19) {NEn = 1.0 + (NE_t2-1)*exp(-Beta2*(t-(NEtemp18+500)))}  	: Basal level\n"
-  "	else if (t >= NEtemp19 && t <= NEtemp19+500) {NEn = NE_t3}					: 5th tone EE\n"
-  "		else if (t > NEtemp19+500 && t < NEtemp20) {NEn = 1.0 + (NE_t2-1)*exp(-Beta2*(t-(NEtemp19+500)))}  	: Basal level\n"
-  "	else if (t >= NEtemp20 && t <= NEtemp20+500) {NEn = NE_t3}					: 6th tone EE\n"
-  "		else if (t > NEtemp20+500 && t < NEtemp21) {NEn = 1.0 + (NE_t2-1)*exp(-Beta2*(t-(NEtemp20+500)))}  	: Basal level\n"
-  "	else if (t >= NEtemp21 && t <= NEtemp21+500) {NEn = NE_t3}					: 7th tone EE\n"
-  "		else if (t > NEtemp21+500 && t < NEtemp22) {NEn = 1.0 + (NE_t2-1)*exp(-Beta2*(t-(NEtemp21+500)))}  	: Basal level	\n"
-  "	else if (t >= NEtemp22 && t <= NEtemp22+500) {NEn = NE_t3}					: 8th tone EE	\n"
-  "		else if (t > NEtemp22+500 && t < NEtemp23) {NEn = 1.0 + (NE_t2-1)*exp(-Beta2*(t-(NEtemp22+500)))}  	: Basal level\n"
-  "	else if (t >= NEtemp23 && t <= NEtemp23+500) {NEn = NE_t3}					: 9th tone EE\n"
-  "		else if (t > NEtemp23+500 && t < NEtemp24) {NEn = 1.0 + (NE_t2-1)*exp(-Beta2*(t-(NEtemp23+500)))}  	: Basal level\n"
-  "	else if (t >= NEtemp24 && t <= NEtemp24+500) {NEn = NE_t3}					: 10th tone EE\n"
-  "		else if (t > NEtemp24+500 && t < NEtemp25) {NEn = 1.0 + (NE_t2-1)*exp(-Beta2*(t-(NEtemp24+500)))}  	: Basal level\n"
-  "	else if (t >= NEtemp25 && t <= NEtemp25+500) {NEn = NE_t3}					: 11th tone EE\n"
-  "		else if (t > NEtemp25+500 && t < NEtemp26) {NEn = 1.0 + (NE_t2-1)*exp(-Beta2*(t-(NEtemp25+500)))}  	: Basal level	\n"
-  "	else if (t >= NEtemp26 && t <= NEtemp26+500) {NEn = NE_t3}					: 12th tone EE	\n"
-  "		else if (t > NEtemp26+500 && t < NEtemp27) {NEn = 1.0 + (NE_t2-1)*exp(-Beta2*(t-(NEtemp26+500)))}  	: Basal level\n"
-  "	else if (t >= NEtemp27 && t <= NEtemp27+500) {NEn = NE_t3}					: 13th tone EE\n"
-  "		else if (t > NEtemp27+500 && t < NEtemp28) {NEn = 1.0 + (NE_t2-1)*exp(-Beta2*(t-(NEtemp27+500)))}  	: Basal level\n"
-  "	else if (t >= NEtemp28 && t <= NEtemp28+500) {NEn = NE_t3}					: 14th tone EE\n"
-  "		else if (t > NEtemp28+500 && t < NEtemp29) {NEn = 1.0 + (NE_t2-1)*exp(-Beta2*(t-(NEtemp28+500)))}  	: Basal level\n"
-  "	else if (t >= NEtemp29 && t <= NEtemp29+500) {NEn = NE_t3}					: 15th tone EE\n"
-  "		else if (t > NEtemp29+500 && t < NEtemp30) {NEn = 1.0 + (NE_t2-1)*exp(-Beta2*(t-(NEtemp29+500)))}  	: Basal level	\n"
-  "	else if (t >= NEtemp30 && t <= NEtemp30+500) {NEn = NE_t3}					: 16th tone EE	\n"
-  "		else if (t > NEtemp30+500 && t < NEtemp31) {NEn = 1.0 + (NE_t2-1)*exp(-Beta2*(t-(NEtemp30+500)))}  	: Basal level\n"
-  "	else if (t >= NEtemp31 && t <= NEtemp31+500) {NEn = NE_t3}					: 17th tone EE\n"
-  "		else if (t > NEtemp31+500 && t < NEtemp32) {NEn = 1.0 + (NE_t2-1)*exp(-Beta2*(t-(NEtemp31+500)))}  	: Basal level\n"
-  "	else if (t >= NEtemp32 && t <= NEtemp32+500) {NEn = NE_t3}					: 18th tone EE\n"
-  "		else if (t > NEtemp32+500 && t < NEtemp33) {NEn = 1.0 + (NE_t2-1)*exp(-Beta2*(t-(NEtemp32+500)))}  	: Basal level\n"
-  "	else if (t >= NEtemp33 && t <= NEtemp33+500) {NEn = NE_t3}					: 19th tone EE\n"
-  "		else if (t > NEtemp33+500 && t < NEtemp34) {NEn = 1.0 + (NE_t2-1)*exp(-Beta2*(t-(NEtemp33+500)))}  	: Basal level	\n"
-  "	else if (t >= NEtemp34 && t <= NEtemp34+500) {NEn = NE_t3}					: 20th tone EE		\n"
-  "		else  {	NEn = 1.0}\n"
-  "\n"
-  "}\n"
-  "FUNCTION NE2(NEstart2 (ms), NEstop2 (ms)) {\n"
-  "\n"
-  "\n"
-  "\n"
-  "\n"
-  "\n"
-  "\n"
-  "\n"
-  "\n"
-  "\n"
-  "\n"
-  "\n"
-  "\n"
-  "\n"
-  "\n"
-  "\n"
-  "\n"
-  "	LOCAL NE2temp1, NE2temp2, NE2temp3, NE2temp4, NE2temp5, NE2temp6, NE2temp7, NE2temp8, NE2temp9, NE2temp10, NE2temp11, NE2temp12, NE2temp13, NE2temp14, NE2temp15, NE2temp16,s\n"
-  "	NE2temp1 = NEstart2 + 4000\n"
-  "	NE2temp2 = NE2temp1 + 4000\n"
-  "	NE2temp3 = NE2temp2 + 4000\n"
-  "	NE2temp4 = NE2temp3 + 4000\n"
-  "	NE2temp5 = NE2temp4 + 4000\n"
-  "	NE2temp6 = NE2temp5 + 4000\n"
-  "	NE2temp7 = NE2temp6 + 4000\n"
-  "	NE2temp8 = NE2temp7 + 4000\n"
-  "	NE2temp9 = NE2temp8 + 4000\n"
-  "	NE2temp10 = NE2temp9 + 4000\n"
-  "	NE2temp11 = NE2temp10 + 4000\n"
-  "	NE2temp12 = NE2temp11 + 4000 \n"
-  "	NE2temp13 = NE2temp12 + 4000\n"
-  "	NE2temp14 = NE2temp13 + 4000\n"
-  "	NE2temp15 = NE2temp14 + 4000\n"
-  "	\n"
-  "	if (t <= NEstart2) { NE2 = 1.0}\n"
-  "	else if (t >= NEstart2 && t <= NEstop2) {NE2 = NE_S }					: 1st shock\n"
-  "		else if (t > NEstop2 && t < NE2temp1) {NE2 = 1.0 + (NE_S-1)*exp(-Beta2*(t-(NEstop2+500)))} \n"
-  "	else if (t >= NE2temp1 && t <= NE2temp1+100) {NE2=NE_S}					: 2nd shock\n"
-  "		else if (t > NE2temp1+100 && t < NE2temp2) {NE2 = 1.0 + (NE_S-1)*exp(-Beta2*(t-(NE2temp1+100)))}   				 \n"
-  "	else if (t >= NE2temp2 && t <= NE2temp2+100) {NE2=NE_S}					: 3rd shock\n"
-  "		else if (t > NE2temp2+100 && t < NE2temp3) {NE2 = 1.0 + (NE_S-1)*exp(-Beta2*(t-(NE2temp2+100)))}  				 \n"
-  "	else if (t >= NE2temp3 && t <= NE2temp3+100) {NE2=NE_S}					: 4th shock\n"
-  "		else if (t > NE2temp3+100 && t < NE2temp4) {NE2 = 1.0 + (NE_S-1)*exp(-Beta2*(t-(NE2temp3+100)))}  				 \n"
-  "	else if (t >= NE2temp4 && t <= NE2temp4+100) {NE2=NE_S}					: 5th shock\n"
-  "		else if (t > NE2temp4+100 && t < NE2temp5) {NE2 = 1.0 + (NE_S-1)*exp(-Beta2*(t-(NE2temp4+100)))}  				 \n"
-  "	else if (t >= NE2temp5 && t <= NE2temp5+100) {NE2=NE_S}					: 6th shock\n"
-  "		else if (t > NE2temp5+100 && t < NE2temp6) {NE2 = 1.0 + (NE_S-1)*exp(-Beta2*(t-(NE2temp5+100)))} 				 \n"
-  "	else if (t >= NE2temp6 && t <= NE2temp6+100) {NE2=NE_S}					: 7th shock\n"
-  "		else if (t > NE2temp6+100 && t < NE2temp7) {NE2 = 1.0 + (NE_S-1)*exp(-Beta2*(t-(NE2temp6+100)))}  				 \n"
-  "	else if (t >= NE2temp7 && t <= NE2temp7+100) {NE2=NE_S}					: 8th shock\n"
-  "		else if (t > NE2temp7+100 && t < NE2temp8) {NE2 = 1.0 + (NE_S-1)*exp(-Beta2*(t-(NE2temp7+100)))}  				    \n"
-  "	else if (t >= NE2temp8 && t <= NE2temp8+100) {NE2=NE_S }					: 9th shock\n"
-  "		else if (t > NE2temp8+100 && t < NE2temp9) {NE2 = 1.0 + (NE_S-1)*exp(-Beta2*(t-(NE2temp8+100)))}  				    \n"
-  "	else if (t >= NE2temp9 && t <= NE2temp9+100) {NE2=NE_S }					: 10th shock\n"
-  "		else if (t > NE2temp9+100 && t < NE2temp10) {NE2 = 1.0 + (NE_S-1)*exp(-Beta2*(t-(NE2temp9+100)))}  				    \n"
-  "	else if (t >= NE2temp10 && t <= NE2temp10+100) {NE2=NE_S}					: 11th shock\n"
-  "		else if (t > NE2temp10+100 && t < NE2temp11) {NE2 = 1.0 + (NE_S-1)*exp(-Beta2*(t-(NE2temp10+100)))}  				 \n"
-  "	else if (t >= NE2temp11 && t <= NE2temp11+100) {NE2=NE_S }					: 12th shock\n"
-  "		else if (t > NE2temp11+100 && t < NE2temp12) {NE2 = 1.0 + (NE_S-1)*exp(-Beta2*(t-(NE2temp11+100)))}  				 \n"
-  "	else if (t >= NE2temp12 && t <= NE2temp12+100) {NE2=NE_S}					: 13th shock\n"
-  "		else if (t > NE2temp12+100 && t < NE2temp13) {NE2 = 1.0 + (NE_S-1)*exp(-Beta2*(t-(NE2temp12+100)))} 				 \n"
-  "	else if (t >= NE2temp13 && t <= NE2temp13+100) {NE2=NE_S }					: 14th shock\n"
-  "		else if (t > NE2temp13+100 && t < NE2temp14) {NE2 = 1.0 + (NE_S-1)*exp(-Beta2*(t-(NE2temp13+100)))}   				 \n"
-  "	else if (t >= NE2temp14 && t <= NE2temp14+100) {NE2=NE_S}					: 15th shock\n"
-  "		else if (t > NE2temp14+100 && t < NE2temp15) {NE2 = 1.0 + (NE_S-1)*exp(-Beta2*(t-(NE2temp14+100)))}  				 \n"
-  "	else if (t >= NE2temp15 && t <= NE2temp15+100) {NE2=NE_S}					: 16th shock\n"
-  "		else  {	NE2 = 1.0}\n"
-  "}\n"
   "FUNCTION GAP1(GAPstart1 (ms), GAPstop1 (ms)) {\n"
   "	LOCAL s\n"
   "	if (t <= GAPstart1) { GAP1 = 1}\n"

@@ -357,7 +357,7 @@ proc insert_mechs() {
 			insert kv
 		}
 
-		axon[0].gbar_na16 = gna16_ais_max	*	0.9	*	1   
+		axon[0].gbar_na16 = gna16_ais_max	*	0.8	*	1   
 		axon[1].gbar_na16 = gna16_ais_max	*	0.1	*	1   
 		axon[2].gbar_na16 = gna16_ais_max	*	0.25	*	1   
 		axon[3].gbar_na16 = gna16_ais_max	*	0.45	*	0.95   

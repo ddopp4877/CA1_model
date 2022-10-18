@@ -4,7 +4,7 @@
     "Beta_gaba": "0.14",
     "Cdur_gaba": "0.7254",
     "gbar_gaba": "0.006",
-    "Erev_gaba": "-70",
+    "Erev_gaba": "-80",
     "initW": "1",
     "initW_lognormal_mean": 0.5,
     "initW_lognormal_std": 0.2,

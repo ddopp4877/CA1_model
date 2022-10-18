@@ -470,7 +470,7 @@ extern void _nrn_thread_table_reg(int, void(*)(double*, Datum*, Datum*, NrnThrea
 extern void hoc_register_tolerance(int, HocStateTolerance*, Symbol***);
 extern void _cvode_abstol( Symbol**, double*, int);
 
- void _chn2pyr_reg() {
+ void _chn2pyrOLD_reg() {
 	int _vectorized = 0;
   _initlists();
  	ion_reg("ca", -10000.);
@@ -498,7 +498,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
  pnt_receive[_mechtype] = _net_receive;
  pnt_receive_size[_mechtype] = 1;
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 chn2pyr /home/dpd4k4/CA1_model/biophys_components/mechanisms/modfiles/chn2pyr.mod\n");
+ 	ivoc_help("help ?1 chn2pyr /home/dpd4k4/CA1_model/biophys_components/mechanisms/modfiles/chn2pyrOLD.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -1652,7 +1652,7 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
   eca = _ion_eca;
   ica = _ion_ica;
  { error =  release();
- if(error){fprintf(stderr,"at line 182 in file chn2pyr.mod:\n	 \n"); nrn_complain(_p); abort_run(error);}
+ if(error){fprintf(stderr,"at line 182 in file chn2pyrOLD.mod:\n	 \n"); nrn_complain(_p); abort_run(error);}
  }}}
 
 }
@@ -1669,7 +1669,7 @@ _first = 0;
 }
 
 #if NMODL_TEXT
-static const char* nmodl_filename = "/home/dpd4k4/CA1_model/biophys_components/mechanisms/modfiles/chn2pyr.mod";
+static const char* nmodl_filename = "/home/dpd4k4/CA1_model/biophys_components/mechanisms/modfiles/chn2pyrOLD.mod";
 static const char* nmodl_file_text = 
   ":Interneuron Cells to Pyramidal Cells GABA with local Ca2+ pool and read public soma Ca2+ pool\n"
   "\n"

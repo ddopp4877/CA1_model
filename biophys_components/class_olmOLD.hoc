@@ -120,7 +120,7 @@ proc mechinit() {
 
 	Vrest = -67
 	
-	Rm = 20000*2
+	Rm = 20000*5
 	
 	gH = 0.0005
 	
@@ -128,14 +128,14 @@ proc mechinit() {
 	gKvAdend = 0.004*.7*1.5
 	
 	// *2.3 gives 2x frequency & no depol. block
-	dfblock = 1
+	dfblock = 2.3
 	gKvEaxon =  0.05104*dfblock
 	gKvEsoma =  0.0319*dfblock
 	gKvEdend =  2*0.023*dfblock
 	
 	gNasoma = 0.0107
 	gNadend = 2*0.0117
-	gNaaxon = 0.01712*0.5
+	gNaaxon = 0.01712
 	
 	eleak = -67	
 }
@@ -151,7 +151,7 @@ proc insert_mechs() {
 		insert ch_Nav // ch_Navsoma
 			gmax_ch_Nav = gNasoma
 		insert ch_leak
-			gmax_ch_leak = 1/(Rm)
+			gmax_ch_leak = 1/Rm
 			e_ch_leak = eleak  	
 	}
 
@@ -185,7 +185,7 @@ proc insert_mechs() {
 		insert ch_Nav // ch_Navsoma //ch_Navaxon
 			gmax_ch_Nav = gNaaxon
 		insert ch_leak
-			gmax_ch_leak = 1/(Rm)
+			gmax_ch_leak = 1/Rm
 			e_ch_leak = eleak  	
   	}
 }

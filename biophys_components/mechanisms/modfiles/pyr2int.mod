@@ -204,10 +204,12 @@ DERIVATIVE release {
 	}
 
 	g_nmda = gbar_nmda*r_nmda * facfactor
-	i_nmda = W_nmda*g_nmda*(v - Erev_nmda)*sfunc(v)
+	:i_nmda = W_nmda*g_nmda*(v - Erev_nmda)*sfunc(v)
+	i_nmda = initW*g_nmda*(v - Erev_nmda)*sfunc(v)
 
 	g_ampa = gbar_ampa*r_ampa * facfactor
-	i_ampa = W_ampa*g_ampa*(v - Erev_ampa)  * (1 + (bACH * (ACH-1)))*(aDA + (bDA * (DA-1))) 
+	:i_ampa = W_ampa*g_ampa*(v - Erev_ampa)  * (1 + (bACH * (ACH-1)))*(aDA + (bDA * (DA-1))) 
+	i_ampa = initW*g_ampa*(v - Erev_ampa)  * (1 + (bACH * (ACH-1)))*(aDA + (bDA * (DA-1))) 
 
 	ICa = P0*g_nmda*(v - ECa)*sfunc(v)
 	Capoolcon'= -fCa*Afactor*ICa + (Cainf-Capoolcon)/tauCa
@@ -223,7 +225,8 @@ NET_RECEIVE(dummy_weight) {
  :printf("%g\t%g\t%g\t%g\t%g\t%g\n", t, t-tsyn, F, D1, D2, facfactor)
 	tsyn = t
 	
-	facfactor = F * D1 * D2
+	facfactor = 1:  F * D1 * D2
+	
 
 	F = F * f
 	

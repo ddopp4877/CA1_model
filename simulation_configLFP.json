@@ -25,7 +25,7 @@
       "input_type": "current_clamp",
       "module": "IClamp",
       "node_set": "all",
-      "gids": [1,2,3],
+      "gids": [1,2],
       "amp": 0.3,
       "delay": 100.0,
       "duration": 15
@@ -39,7 +39,7 @@
       "amps": [[-70,-70,-70]],
       "durations": [[300,300,300]],
       "node_set": "all",
-      "gids":[0],
+      "gids":[15],
       "rs": [0.01]
       
   }
@@ -77,10 +77,10 @@
 
       "i_report_syn":{
         "variable_name":"igaba",
-        "cells": [53],
+        "cells": [22],
         "module": "netcon_report",
-        "sections": "axon",
-        "syn_type":"chn2pyr"
+        "sections": "all",
+        "syn_type":"pyr2olm"
       },
       "voltage_clamp": {
         "gids": [0,1],
@@ -88,12 +88,9 @@
         "sections": "soma",
         "variable_name": "se",
         "clamps": [0,1]
-    },
+    }
     
-      "save_synapses_mod": {
-        "module": "save_synapses",
-        "network_dir": "updated_conns"
-      }
+
 
       },
 
