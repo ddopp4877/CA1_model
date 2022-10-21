@@ -101,3 +101,55 @@
   "node_sets_file": "$BASE_DIR/node_sets.json",
   "network": "$BASE_DIR/circuit_config.json"
 }
+
+"i_report_syn":{
+  "variable_name":"i_nmda",
+  "cells": [27],
+  "module": "netcon_report",
+  "sections": "basal",
+  "syn_type":"pyr2int"
+},
+"i_report_syn2":{
+  "variable_name":"i_ampa",
+  "cells": [27],
+  "module": "netcon_report",
+  "sections": "basal",
+  "syn_type":"pyr2int"
+},
+
+"v_report_axon": {
+  "variable_name": "v",
+  "gids": [53],
+  "module": "membrane_report",
+  "sections": "all"
+},
+
+18030,14,19,7
+,5,6,7,8
+,18030,14,19,7 18048,
+
+  ,0.01,0.01,0.01,0.01
+
+  ,
+    "voltage_clamp": {
+      
+      
+      "input_type": "voltage_clamp",
+      "module": "SEClamp",
+      "sections": "soma",
+      "amps": [[-70,-70,-70]],
+      "durations": [[300,300,300]],
+      "node_set": "all",
+      "gids":[14],
+      "rs": [0.01]
+      
+  }
+
+  
+  "voltage_clamp": {
+    "gids": [14],
+    "module": "clamp_report",
+    "sections": "soma",
+    "variable_name": "se",
+    "clamps": [0]
+}

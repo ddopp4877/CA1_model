@@ -8,7 +8,7 @@
   "target_simulator": "NEURON",
   "run": {
     "tstart": 0.0,
-    "tstop": 300.0,
+    "tstop": 2000.0,
     "dt": 0.1,
     "dL": 20.0,
     "spike_threshold": -15.0,
@@ -29,21 +29,9 @@
       "amp": 0.3,
       "delay": 100.0,
       "duration": 15
-    },
-    "voltage_clamp": {
-      
-      
-      "input_type": "voltage_clamp",
-      "module": "SEClamp",
-      "sections": "soma",
-      "amps": [[-70,-70,-70]],
-      "durations": [[300,300,300]],
-      "node_set": "all",
-      "gids":[15],
-      "rs": [0.01]
-      
-  }
-    
+    }
+
+ 
  },
  
   "output": {
@@ -66,36 +54,12 @@
         "cells": "all",
         "module": "membrane_report",
         "sections": "soma"
-      },
-
-      "v_report_axon": {
-        "variable_name": "v",
-        "gids": [53],
-        "module": "membrane_report",
-        "sections": "all"
-      },
-
-      "i_report_syn":{
-        "variable_name":"igaba",
-        "cells": [22],
-        "module": "netcon_report",
-        "sections": "all",
-        "syn_type":"pyr2olm"
-      },
-      "voltage_clamp": {
-        "gids": [0,1],
-        "module": "clamp_report",
-        "sections": "soma",
-        "variable_name": "se",
-        "clamps": [0,1]
-    }
-    
+      }
 
 
       },
 
 
-  
   "node_sets_file": "$BASE_DIR/node_sets.json",
   "network": "$BASE_DIR/circuit_config.json"
 }
