@@ -20,7 +20,7 @@ net = NetworkBuilder("biophysical")
 
 # amount of cells
 NetNo = 20000
-#NetNo = 5000
+#NetNo = 1000
 IN_num = NetNo*.11#about 11% of all neurons are interneurons in this network (Bezaire 2013). We are only modeling 2, so omit the others, or substitute PV and OLM for all
 PN_num = NetNo -  IN_num
 
@@ -29,8 +29,13 @@ numOLM = .043*IN_num # 4% of all INs are OLMs
 numPV = .144*IN_num
 numPyr = PN_num
 numAAC = 0.038*IN_num
+totalScale = (1 - (.043 + .144 + 0.038))/3
 
-
+#scale up so that 11% of cells in the model are INs
+numOLM = numOLM + IN_num*totalScale
+numPV = numPV + IN_num*totalScale
+numAAC = numAAC + IN_num*totalScale
+print(numOLM + numAAC + numPV)
 # amount of cells per layer
 numAAC_inSO = int(ceil(numAAC*0.238))  # sometimes the num will be <1 so always round up so there is at least one.
 numPV_inSO = int(ceil(numPV*0.238))

@@ -124,8 +124,8 @@ proc mechinit() {
 	
 	gH = 0.0005
 	
-	gKvAsoma = 0.0165*.3*1.5
-	gKvAdend = 0.004*.7*1.5
+	gKvAsoma = 0.0165*.3
+	gKvAdend = 0.004*.7
 	
 	// *2.3 gives 2x frequency & no depol. block
 	dfblock = 1
@@ -135,7 +135,7 @@ proc mechinit() {
 	
 	gNasoma = 0.0107
 	gNadend = 2*0.0117
-	gNaaxon = 0.01712*0.5
+	gNaaxon = 0.01712
 	
 	eleak = -67	
 }
@@ -196,7 +196,7 @@ proc set_chanparams() {
 					//  section variable that must be set for each
 					//  section. Default is 35.4.
 
-		cm = 1.3	// capacitance in uF/cm^2. default = 1.0
+		cm = 2	// capacitance in uF/cm^2. default = 1.0
 		//ena = 55
 		//ek = -90
 	}  // make catau slower70e-3 	cao=2 cai=50.e-6 

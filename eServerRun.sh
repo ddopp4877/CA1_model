@@ -8,4 +8,4 @@ if [ -d "output" ]; then
 fi
 
 
-time mpirun -np 50 nrniv -mpi -python run_network.py
+time mpiexec -np 50 nrniv -mpi -python run_network.py

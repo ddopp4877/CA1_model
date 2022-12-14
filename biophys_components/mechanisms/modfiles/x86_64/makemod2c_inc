@@ -327,6 +327,14 @@
 	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
+./svclmpwd.c: ../svclmpwd.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) svclmpwd.mod -o "/home/dpd4k4/CA1_model/biophys_components/mechanisms/modfiles/x86_64")
+
+./svclmpwd.o: ./svclmpwd.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
+
 ./vecevent.c: ../vecevent.mod
 	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
 	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) vecevent.mod -o "/home/dpd4k4/CA1_model/biophys_components/mechanisms/modfiles/x86_64")

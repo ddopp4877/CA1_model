@@ -47,6 +47,7 @@ extern void _positionfcns_reg(void);
 extern void _pyr2int_reg(void);
 extern void _pyr2pyr_reg(void);
 extern void _SIN_reg(void);
+extern void _svclmpwd_reg(void);
 extern void _vecevent_reg(void);
 extern void _xtra_reg(void);
 
@@ -95,6 +96,7 @@ void modl_reg(){
     fprintf(stderr," \"pyr2int.mod\"");
     fprintf(stderr," \"pyr2pyr.mod\"");
     fprintf(stderr," \"SIN.mod\"");
+    fprintf(stderr," \"svclmpwd.mod\"");
     fprintf(stderr," \"vecevent.mod\"");
     fprintf(stderr," \"xtra.mod\"");
     fprintf(stderr, "\n");
@@ -140,6 +142,7 @@ void modl_reg(){
   _pyr2int_reg();
   _pyr2pyr_reg();
   _SIN_reg();
+  _svclmpwd_reg();
   _vecevent_reg();
   _xtra_reg();
 }
