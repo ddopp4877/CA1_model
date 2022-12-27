@@ -1,1 +1,0 @@
-../mynetstim.mod

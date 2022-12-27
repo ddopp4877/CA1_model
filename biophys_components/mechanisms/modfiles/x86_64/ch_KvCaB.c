@@ -265,11 +265,13 @@ extern void _cvode_abstol( Symbol**, double*, int);
  	hoc_register_cvode(_mechtype, _ode_count, _ode_map, _ode_spec, _ode_matsol);
  	hoc_register_tolerance(_mechtype, _hoc_state_tol, &_atollist);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 ch_KvCaB /home/dpd4k4/CA1_model/biophys_components/mechanisms/modfiles/x86_64/ch_KvCaB.mod\n");
+ 	ivoc_help("help ?1 ch_KvCaB /home/dpd4k4/CA1_model/biophys_components/mechanisms/modfiles/ch_KvCaB.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
- static double FARADAY = 96.4853;
+ 
+#define FARADAY _nrnunit_FARADAY[_nrnunit_use_legacy_]
+static double _nrnunit_FARADAY[2] = {0x1.81f0fae775425p+6, 96.4853}; /* 96.4853321233100161 */
  static double R = 8.313424;
 static int _reset;
 static char *modelname = "Calcium activated potassium channel (voltage dependent)";

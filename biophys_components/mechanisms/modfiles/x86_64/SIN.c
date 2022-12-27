@@ -215,11 +215,13 @@ extern void _cvode_abstol( Symbol**, double*, int);
   hoc_register_dparam_semantics(_mechtype, 0, "area");
   hoc_register_dparam_semantics(_mechtype, 1, "pntproc");
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 sinstim /home/dpd4k4/CA1_model/biophys_components/mechanisms/modfiles/x86_64/SIN.mod\n");
+ 	ivoc_help("help ?1 sinstim /home/dpd4k4/CA1_model/biophys_components/mechanisms/modfiles/SIN.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
- static double PI = 3.14159;
+ 
+#define PI _nrnunit_PI[_nrnunit_use_legacy_]
+static double _nrnunit_PI[2] = {0x1.921fb54442d18p+1, 3.14159}; /* 3.14159265358979312 */
 static int _reset;
 static char *modelname = "";
 

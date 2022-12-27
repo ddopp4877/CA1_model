@@ -170,7 +170,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
 #endif
   hoc_register_prop_size(_mechtype, 6, 0);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 ch_leak /home/dpd4k4/CA1_model/biophys_components/mechanisms/modfiles/x86_64/ch_leak.mod\n");
+ 	ivoc_help("help ?1 ch_leak /home/dpd4k4/CA1_model/biophys_components/mechanisms/modfiles/ch_leak.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }

@@ -234,7 +234,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
   hoc_register_dparam_semantics(_mechtype, 2, "k_ion");
  	hoc_register_cvode(_mechtype, _ode_count, 0, 0, 0);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 ch_Kdrfastngf /home/dpd4k4/CA1_model/biophys_components/mechanisms/modfiles/x86_64/ch_Kdrfastngf.mod\n");
+ 	ivoc_help("help ?1 ch_Kdrfastngf /home/dpd4k4/CA1_model/biophys_components/mechanisms/modfiles/ch_Kdrfastngf.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }

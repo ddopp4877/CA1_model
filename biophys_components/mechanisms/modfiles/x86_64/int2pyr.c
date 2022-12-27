@@ -498,7 +498,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
  pnt_receive[_mechtype] = _net_receive;
  pnt_receive_size[_mechtype] = 1;
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 int2pyr /home/dpd4k4/CA1_model/biophys_components/mechanisms/modfiles/x86_64/int2pyr.mod\n");
+ 	ivoc_help("help ?1 int2pyr /home/dpd4k4/CA1_model/biophys_components/mechanisms/modfiles/int2pyr.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }

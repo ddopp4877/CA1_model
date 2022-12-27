@@ -335,7 +335,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
   hoc_register_dparam_semantics(_mechtype, 2, "na_ion");
  	hoc_register_cvode(_mechtype, _ode_count, 0, 0, 0);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 ch_Navcck /home/dpd4k4/CA1_model/biophys_components/mechanisms/modfiles/x86_64/ch_Navcck.mod\n");
+ 	ivoc_help("help ?1 ch_Navcck /home/dpd4k4/CA1_model/biophys_components/mechanisms/modfiles/ch_Navcck.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
