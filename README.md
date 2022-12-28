@@ -27,7 +27,7 @@ bash eServerRun.sh
 ```
 ### Changing parameters
 ```
-biophys_components/synaptic_mechanisms
+biophys_components/synaptic_models
 has json files that are used to select the parameters for each synapse in the model
 initW_lognormal_mean and std are the parameters to change to remove connections.
 use a small nonzero number like 0.00001 to effectively remove the synapse
