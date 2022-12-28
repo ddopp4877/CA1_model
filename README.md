@@ -32,7 +32,7 @@ has json files that are used to select the parameters for each synapse in the mo
 initW_lognormal_mean and std are the parameters to change to remove connections.
 use a small nonzero number like 0.00001 to effectively remove the synapse
 
-simulation_config_LFP.json is the simulation config that the run script uses.
+simulation_configLFP.json is the simulation config that the run script uses.
 
 ```
 
