@@ -25,7 +25,7 @@
       "input_type": "current_clamp",
       "module": "IClamp",
       "node_set": "all",
-      "gids": [0,1,15],
+      "gids": [18877,18905,18958],
       "amp": 0.6,
       "delay": 100.0,
       "duration": 8
@@ -41,6 +41,20 @@
     "spikes_file": "spikes.h5"
   },
   "reports": {
+
+      "save_synapses_mod": {
+        "module": "save_synapses",
+        "network_dir": "updated_conns"
+      },
+      "syn_report1": {
+        "cells": "all",
+        "variable_name": "igaba",
+        "module": "netcon_report",
+        "sections": "all",
+        "syn_type": "chn2pyr",
+        "file_name": "syns_chn2pyr.h5"
+      },
+
       "ecp": {
       "cells": "all",
       "variable_name": "v",

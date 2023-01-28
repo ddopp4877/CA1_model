@@ -6,7 +6,7 @@
     "gbar_gaba": "0.006",
     "Erev_gaba": "-70",
     "initW": "1",
-    "initW_lognormal_mean": 2.5,
+    "initW_lognormal_mean": 1.5,
     "initW_lognormal_std": 0.3,
     "Wmax": "20",
     "Wmin": "0.25",

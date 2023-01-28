@@ -136,7 +136,7 @@ def setEdges(netObj,src,dest,conParams,dynamics_name,dist_range,secName,secID,se
                      connection_rule=n_connections,
                      connection_params={'prob': conParams[0], 'max_dist': conParams[1]},  
                      delay=0.8,
-                     syn_weight = syn[dynamics_name]['initW_lognormal_mean'],#syn[dynamics_name]['initW_lognormal_mean'],
+                     syn_weight = syn[dynamics_name]['initW_lognormal_mean'],
                      dynamics_params=dynamics_name,
                      model_template=syn[dynamics_name]['level_of_detail'],
                      distance_range=dist_range,
@@ -186,6 +186,16 @@ def lognormal(source, target,m,s):
     mean = np.log(m) - 0.5 * np.log((s / m) ** 2 + 1)
     std = np.sqrt(np.log((s / m) ** 2 + 1))
     synaptic_weight = np.random.lognormal(mean, std, 1)
+    
+    if source['pop_name'] == 'AAC':
+        
+        synaptic_weight = float(np.random.lognormal(m, s, 1)-np.mean(np.random.lognormal(m,s,1000)))
+        if synaptic_weight >= float(m*1.2):
+            synaptic_weight = float(m*1.2)
+        if synaptic_weight < 0:
+            synaptic_weight = 0.1*m
+
+    
     return synaptic_weight
 
 

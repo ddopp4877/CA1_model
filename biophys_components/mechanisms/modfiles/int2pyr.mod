@@ -55,7 +55,7 @@ PARAMETER {
 	threshold2 = 0.6 :0.52 :  0.53 : 0.5 : 0.45 : 1.0 : 1.4 : 0.8 : 0.65 :0.70 (uM)
 
 	:GABA Weight
-	initW = 5.0 : 3.0 : 4.0 : 5.0 : 4.2 : 3.5 :4.5 : :  :  3 :  2.5 : 5
+	initW = 2:5.0 : 3.0 : 4.0 : 5.0 : 4.2 : 3.5 :4.5 : :  :  3 :  2.5 : 5
 	fmax = 3 : 2.85 :4 : 3 : 3
 	fmin = .8
 	
@@ -180,15 +180,9 @@ if ((eta(capoolcon)*(lambda1*omega(capoolcon, threshold1, threshold2)-lambda2*GA
  		:W = Wmin
 	:}
 	 
-	    if (neuroM==1) {
-	g_gaba = gbar_gaba*r_gaba*facfactor*DA1(DAstart1,DAstop1)*DA2(DAstart2,DAstop2)   : Dopamine effect on GABA	
-	} else if (neuroM==2) {
-	g_gaba = gbar_gaba*r_gaba*facfactor*NEn(NEstart1,NEstop1)*NE2(NEstart2,NEstop2)   : Norepinephrine effect on GABA		    	
-	} else if (neuroM==3) {
-	g_gaba = gbar_gaba*r_gaba*facfactor*DA1(DAstart1,DAstop1)*DA2(DAstart2,DAstop2)*NEn(NEstart1,NEstop1)*NE2(NEstart2,NEstop2)   : Dopamine & Norepinephrine effect on GABA		    
-	} else {
-	g_gaba = gbar_gaba*r_gaba*facfactor
-	}
+
+	g_gaba = gbar_gaba*r_gaba
+	
 
     igaba = W*g_gaba*(v - Erev_gaba)
 

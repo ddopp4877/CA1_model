@@ -429,7 +429,7 @@ static void nrn_alloc(Prop* _prop) {
  	lambda2 = 0.01;
  	threshold1 = 0.5;
  	threshold2 = 0.6;
- 	initW = 5;
+ 	initW = 2;
  	fmax = 3;
  	fmin = 0.8;
  	thr_rp = 1;
@@ -1552,18 +1552,7 @@ static double _nrn_current(double _v){double _current=0.;v=_v;{ {
    else {
      limitW = 1.0 ;
      }
-   if ( neuroM  == 1.0 ) {
-     g_gaba = gbar_gaba * r_gaba * facfactor * DA1 ( _threadargscomma_ DAstart1 , DAstop1 ) * DA2 ( _threadargscomma_ DAstart2 , DAstop2 ) ;
-     }
-   else if ( neuroM  == 2.0 ) {
-     g_gaba = gbar_gaba * r_gaba * facfactor * NEn ( _threadargscomma_ NEstart1 , NEstop1 ) * NE2 ( _threadargscomma_ NEstart2 , NEstop2 ) ;
-     }
-   else if ( neuroM  == 3.0 ) {
-     g_gaba = gbar_gaba * r_gaba * facfactor * DA1 ( _threadargscomma_ DAstart1 , DAstop1 ) * DA2 ( _threadargscomma_ DAstart2 , DAstop2 ) * NEn ( _threadargscomma_ NEstart1 , NEstop1 ) * NE2 ( _threadargscomma_ NEstart2 , NEstop2 ) ;
-     }
-   else {
-     g_gaba = gbar_gaba * r_gaba * facfactor ;
-     }
+   g_gaba = gbar_gaba * r_gaba ;
    igaba = W * g_gaba * ( v - Erev_gaba ) ;
    ICag = P0g * g_gaba * ( v - eca ) ;
    Icatotal = ICag + k * ica * 4.0 * pi * ( pow( ( 15.0 / 2.0 ) , 2.0 ) ) * ( 0.01 ) ;
@@ -1652,7 +1641,7 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
   eca = _ion_eca;
   ica = _ion_ica;
  { error =  release();
- if(error){fprintf(stderr,"at line 182 in file int2pyr.mod:\n	 \n"); nrn_complain(_p); abort_run(error);}
+ if(error){fprintf(stderr,"at line 183 in file int2pyr.mod:\n\n"); nrn_complain(_p); abort_run(error);}
  }}}
 
 }
@@ -1728,7 +1717,7 @@ static const char* nmodl_file_text =
   "	threshold2 = 0.6 :0.52 :  0.53 : 0.5 : 0.45 : 1.0 : 1.4 : 0.8 : 0.65 :0.70 (uM)\n"
   "\n"
   "	:GABA Weight\n"
-  "	initW = 5.0 : 3.0 : 4.0 : 5.0 : 4.2 : 3.5 :4.5 : :  :  3 :  2.5 : 5\n"
+  "	initW = 2:5.0 : 3.0 : 4.0 : 5.0 : 4.2 : 3.5 :4.5 : :  :  3 :  2.5 : 5\n"
   "	fmax = 3 : 2.85 :4 : 3 : 3\n"
   "	fmin = .8\n"
   "	\n"
@@ -1853,15 +1842,9 @@ static const char* nmodl_file_text =
   " 		:W = Wmin\n"
   "	:}\n"
   "	 \n"
-  "	    if (neuroM==1) {\n"
-  "	g_gaba = gbar_gaba*r_gaba*facfactor*DA1(DAstart1,DAstop1)*DA2(DAstart2,DAstop2)   : Dopamine effect on GABA	\n"
-  "	} else if (neuroM==2) {\n"
-  "	g_gaba = gbar_gaba*r_gaba*facfactor*NEn(NEstart1,NEstop1)*NE2(NEstart2,NEstop2)   : Norepinephrine effect on GABA		    	\n"
-  "	} else if (neuroM==3) {\n"
-  "	g_gaba = gbar_gaba*r_gaba*facfactor*DA1(DAstart1,DAstop1)*DA2(DAstart2,DAstop2)*NEn(NEstart1,NEstop1)*NE2(NEstart2,NEstop2)   : Dopamine & Norepinephrine effect on GABA		    \n"
-  "	} else {\n"
-  "	g_gaba = gbar_gaba*r_gaba*facfactor\n"
-  "	}\n"
+  "\n"
+  "	g_gaba = gbar_gaba*r_gaba\n"
+  "	\n"
   "\n"
   "    igaba = W*g_gaba*(v - Erev_gaba)\n"
   "\n"

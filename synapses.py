@@ -462,18 +462,21 @@ def Chn2Pyr(syn_params, sec_x, sec_id):
     if syn_params.get('initW'):
         m = syn_params.get('initW_lognormal_mean')
         s = syn_params.get('initW_lognormal_std')
-        mean = np.log(m) - 0.5 * np.log((s/m)**2+1)
-        std = np.sqrt(np.log((s/m)**2 + 1))
-        log_weight = float(np.random.lognormal(mean,std, 1))
-        if log_weight >= float(5*m):
-            log_weight = float(5*m)
+        mean = m# np.log(m) - 0.5 * np.log((s/m)**2+1)
+        std = s#np.sqrt(np.log((s/m)**2 + 1))
+        log_weight = float(np.random.lognormal(mean,std, 1)*0.001)
+        if log_weight >= float(3*m):
+            
+            log_weight = float(3*m)
+        
+            
         lsyn.initW = float(log_weight) # par.x(0) * rC.uniform(0.5,1.0)//rand.normal(0.5,1.5) //`rand.repick()
         
 
     if syn_params.get('Wmax'):
-        lsyn.Wmax = float(syn_params['Wmax']) * lsyn.initW # par.x(1) * lsyn.initW
+        lsyn.Wmax = lsyn.initW*3#float(syn_params['Wmax']) * lsyn.initW # par.x(1) * lsyn.initW
     if syn_params.get('Wmin'):
-        lsyn.Wmin = float(syn_params['Wmin']) * lsyn.initW # par.x(2) * lsyn.initW
+        lsyn.Wmin = 0.000001#float(syn_params['Wmin']) * lsyn.initW # par.x(2) * lsyn.initW
     #delay = float(syn_params['initW']) # par.x(3) + delayDistance
     #lcon = new NetCon(&v(0.5), lsyn, 0, delay, 1)
 
@@ -498,7 +501,7 @@ def Chn2Pyr(syn_params, sec_x, sec_id):
     if syn_params.get('f'):
         lsyn.f = float(syn_params['f']) # par.x(15)
 
-    
+ 
     return lsyn
 
 def chn2pyr(syn_params, xs, secs):
