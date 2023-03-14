@@ -46,14 +46,7 @@
         "module": "save_synapses",
         "network_dir": "updated_conns"
       },
-      "syn_report1": {
-        "cells": "all",
-        "variable_name": "igaba",
-        "module": "netcon_report",
-        "sections": "all",
-        "syn_type": "chn2pyr",
-        "file_name": "syns_chn2pyr.h5"
-      },
+
 
       "ecp": {
       "cells": "all",

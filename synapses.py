@@ -457,6 +457,9 @@ def Chn2Pyr(syn_params, sec_x, sec_id):
         lsyn.gbar_gaba = float(syn_params['gbar_gaba']) # par.x(24)
     if syn_params.get('Erev_gaba'):
         lsyn.Erev_gaba = float(syn_params['Erev_gaba']) # par.x(16)
+    if syn_params.get('gmax'):
+        lsyn.gmax = float(syn_params['gmax'])
+        
 
     
     if syn_params.get('initW'):

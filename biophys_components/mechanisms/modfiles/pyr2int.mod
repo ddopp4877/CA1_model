@@ -1,270 +1,172 @@
+COMMENT
+/**
+ * @file DetAMPANMDA.mod
+ * @brief Adapted from ProbAMPANMDA_EMS.mod by Eilif, Michael and Srikanth
+ * @author chindemi
+ * @date 2014-05-25
+ * @remark Copyright (c) BBP/EPFL 2005-2021. This work is licenced under Creative Common CC BY-NC-SA-4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/)
+* Several changes have been made from the orginal version of this synapse by Greg Glickert to better adapt the model for Large Scale BMTk/Neuron models
+ */
+ENDCOMMENT
+
+
+TITLE AMPA and NMDA receptor with presynaptic short-term plasticity
+
+
+COMMENT
+AMPA and NMDA receptor conductance using a dual-exponential profile
+presynaptic short-term plasticity based on Fuhrmann et al. 2002, deterministic
+version.
+ENDCOMMENT
+
+
 NEURON {
-	POINT_PROCESS pyr2int
-	NONSPECIFIC_CURRENT i_nmda, i_ampa
-	RANGE initW
-	RANGE Cdur_nmda, AlphaTmax_nmda, Beta_nmda, Erev_nmda, gbar_nmda, W_nmda, on_nmda, g_nmda
-	RANGE Cdur_ampa, AlphaTmax_ampa, Beta_ampa, Erev_ampa, gbar_ampa, W_ampa, on_ampa, g_ampa
-	RANGE ECa, ICa, P0, fCa, tauCa, iCatotal
-	RANGE Cainf, pooldiam, z
-	RANGE lambda1, lambda2, threshold1, threshold2
-	RANGE fmax, fmin, Wmax, Wmin, maxChange, normW, scaleW
-	RANGE pregid,postgid
-	
-	:Added by Ali
-	RANGE F, f, tauF, D1, d1, tauD1, D2, d2, tauD2
-	RANGE facfactor
-	RANGE aACH, bACH, aDA, bDA, wACH, wDA, calcium
+    THREADSAFE
+
+    POINT_PROCESS pyr2int
+    RANGE initW     : synaptic scaler for large scale networks added by Greg
+    RANGE tau_r_AMPA, tau_d_AMPA, tau_r_NMDA, tau_d_NMDA
+    RANGE Use, u, Dep, Fac, u0, mg, NMDA_ratio
+    RANGE i, i_AMPA, i_NMDA, g_AMPA, g_NMDA, g, e,gmax
+    NONSPECIFIC_CURRENT i
+    RANGE synapseID, verboseLevel
+    RANGE conductance
+    GLOBAL nc_type_param
+    : For debugging
+    :RANGE sgid, tgid
 }
 
-UNITS {
-	(mV) = (millivolt)
-        (nA) = (nanoamp)
-	(uS) = (microsiemens)
-	FARADAY = 96485 (coul)
-	pi = 3.141592 (1)
-}
 
 PARAMETER {
-: parameters are vars assigned by user or changed by hoc. THey appear in nrnpointmenu
-	initW = 5
-
-	Cdur_nmda = 17.58 (ms)
-	AlphaTmax_nmda = .08 (/ms)
-	Beta_nmda = 0.008 (/ms)
-	Erev_nmda = 0 (mV)
-	gbar_nmda = .6e-3 (uS)
-
-	Cdur_ampa = 5.31 (ms)
-	AlphaTmax_ampa = 0.117 (/ms)
-	Beta_ampa = 0.090 (/ms)
-	Erev_ampa = 0 (mV)
-	gbar_ampa = 1.7e-3 (uS)
-
-	ECa = 120
-
-	Cainf = 50e-6 (mM)
-	pooldiam =  1.8172 (micrometer)
-	z = 2
-
-	tauCa = 50 (ms)
-	P0 = .015
-	fCa = .024
-
-	lambda1 = 2.5
-	lambda2 = .01
-	threshold1 = 0.2 (uM)
-	threshold2 = 0.4 (uM)
-
-	fmax = 3
-	fmin = .8
-
-	:Added by Ali
-	ACH = 1
-	DA = 1
-	LearningShutDown = 1
-
-	facfactor = 1
-	: the (1) is needed for the range limits to be effective
-        f = 1 (1) < 0, 1e9 >    : facilitation
-        tauF = 1 (ms) < 1e-9, 1e9 >
-        d1 = 1 (1) < 0, 1 >     : fast depression
-        tauD1 = 1 (ms) < 1e-9, 1e9 >
-        d2 = 1 (1) < 0, 1 >     : slow depression
-        tauD2 = 1 (ms) < 1e-9, 1e9 >
-		
-	aACH = 1
-	bACH = 0
-	wACH = 0
-	aDA = 1
-	bDA = 0
-	wDA = 0
+    initW         = 1.0      : added by Greg Glickert to scale synaptic weight for large scale modeling
+    tau_r_AMPA = 1.5   (ms)  : Dual-exponential conductance profile
+    tau_d_AMPA = 1.7   (ms)  : IMPORTANT: tau_r < tau_d
+    tau_r_NMDA = 1.5
+      (ms)  : Dual-exponential conductance profile
+    tau_d_NMDA = 20    (ms)  : IMPORTANT: tau_r < tau_d
+    Use = 1.0          (1)   : Utilization of synaptic efficacy
+    Dep = 100          (ms)  : Relaxation time constant from depression
+    Fac = 10           (ms)  : Relaxation time constant from facilitation
+    e = 0              (mV)  : AMPA and NMDA reversal potential
+    mg = 1             (mM)  : Initial concentration of mg2+
+    gmax = .45        (uS)  : Weight conversion factor (from nS to uS)
+    u0 = 0                   : Initial value of u, which is the running value of Use
+    NMDA_ratio = 0.71  (1)   : The ratio of NMDA to AMPA
+    synapseID = 0
+    verboseLevel = 0
+    conductance = 0.0
+    nc_type_param = 7
 
 }
+
 
 ASSIGNED {
-: These are vars calculated by Neuron hoc or by the mechanism mod itself
-	v (mV)
+    v (mV)
+    i (nA)
+    i_AMPA (nA)
+    i_NMDA (nA)
+    g_AMPA (uS)
+    g_NMDA (uS)
+    g (uS)
 
-	i_nmda (nA)
-	g_nmda (uS)
-	on_nmda
-	W_nmda
-
-	i_ampa (nA)
-	g_ampa (uS)
-	on_ampa
-	W_ampa
-
-	t0 (ms)
-
-	ICa (mA)
-	Afactor	(mM/ms/nA)
-	iCatotal (mA)
-
-	dW_ampa
-	Wmax
-	Wmin
-	maxChange
-	normW
-	scaleW
-	
-	pregid
-	postgid
-	
-	:Added by Ali
-		calcium
-
-		tsyn
-	
-		fa
-		F
-		D1
-		D2
-		
+    mggate
 }
 
-STATE { r_nmda r_ampa Capoolcon }
 
-INITIAL {
-	on_nmda = 0
-	r_nmda = 0
-	W_nmda = initW
+STATE {
+    A_AMPA       : AMPA state variable to construct the dual-exponential profile - decays with conductance tau_r_AMPA
+    B_AMPA       : AMPA state variable to construct the dual-exponential profile - decays with conductance tau_d_AMPA
+    A_NMDA       : NMDA state variable to construct the dual-exponential profile - decays with conductance tau_r_NMDA
+    B_NMDA       : NMDA state variable to construct the dual-exponential profile - decays with conductance tau_d_NMDA
+}
 
-	on_ampa = 0
-	r_ampa = 0
-	W_ampa = initW
 
-	t0 = -1
+INITIAL{
+    LOCAL tp_AMPA, tp_NMDA
 
-	:Wmax = 2*initW
-	:Wmin = 0.25*initW
-	maxChange = (Wmax-Wmin)/10
-	dW_ampa = 0
+    A_AMPA = 0
+    B_AMPA = 0
 
-	Capoolcon = Cainf
-	Afactor	= 1/(z*FARADAY*4/3*pi*(pooldiam/2)^3)*(1e6)
-	
-	:Added by Ali
+    A_NMDA = 0
+    B_NMDA = 0
 
-		tsyn = -1e30
+    tp_AMPA = (tau_r_AMPA*tau_d_AMPA)/(tau_d_AMPA-tau_r_AMPA)*log(tau_d_AMPA/tau_r_AMPA) :time to peak of the conductance
+    tp_NMDA = (tau_r_NMDA*tau_d_NMDA)/(tau_d_NMDA-tau_r_NMDA)*log(tau_d_NMDA/tau_r_NMDA) :time to peak of the conductance
 
-	fa =0
-	F = 1
-	D1 = 1
-	D2 = 1
+
 
 }
+
 
 BREAKPOINT {
-	SOLVE release METHOD cnexp
+    SOLVE state METHOD cnexp
+    mggate = 1 / (1 + exp(0.062 (/mV) * -(v)) * (mg / 3.57 (mM))) :mggate kinetics - Jahr & Stevens 1990
+    g_AMPA = gmax*(B_AMPA-A_AMPA) :compute time varying conductance as the difference of state variables B_AMPA and A_AMPA
+    g_NMDA = gmax*(B_NMDA-A_NMDA) * mggate :compute time varying conductance as the difference of state variables B_NMDA and A_NMDA and mggate kinetics
+    g = g_AMPA + g_NMDA
+    i_AMPA = g_AMPA*(v-e) * initW :compute the AMPA driving force based on the time varying conductance, membrane potential, and AMPA reversal
+    i_NMDA = g_NMDA*(v-e) * initW :compute the NMDA driving force based on the time varying conductance, membrane potential, and NMDA reversal
+    i = i_AMPA + i_NMDA
 }
 
-DERIVATIVE release {
-	if (t0>0) {
-		if (t-t0 < Cdur_nmda) {
-			on_nmda = 1
-		} else {
-			on_nmda = 0
-		}
-		if (t-t0 < Cdur_ampa) {
-			on_ampa = 1
-		} else {
-			on_ampa = 0
-		}
-	}
-	r_nmda' = AlphaTmax_nmda*on_nmda*(1-r_nmda) -Beta_nmda*r_nmda
-	r_ampa' = AlphaTmax_ampa*on_ampa*(1-r_ampa) -Beta_ampa*r_ampa
 
-	dW_ampa = eta(Capoolcon)*(lambda1*omega(Capoolcon, threshold1, threshold2)-lambda2*W_ampa)*dt
-
-	: Limit for extreme large weight changes
-	if (fabs(dW_ampa) > maxChange) {
-		if (dW_ampa < 0) {
-			dW_ampa = -1*maxChange
-		} else {
-			dW_ampa = maxChange
-		}
-	}
-
-	:Normalize the weight change
-	normW = (W_ampa-Wmin)/(Wmax-Wmin)
-	if (dW_ampa < 0) {
-		scaleW = sqrt(fabs(normW))
-	} else {
-		scaleW = sqrt(fabs(1.0-normW))
-	}
-
-	W_ampa = W_ampa + dW_ampa*scaleW *(1+ (wACH * (ACH - 1))) * LearningShutDown
-	
-	:Weight value limits
-	if (W_ampa > Wmax) { 
-		W_ampa = Wmax
-	} else if (W_ampa < Wmin) {
- 		W_ampa = Wmin
-	}
-
-	g_nmda = gbar_nmda*r_nmda * facfactor
-	:i_nmda = W_nmda*g_nmda*(v - Erev_nmda)*sfunc(v)
-	i_nmda = initW*g_nmda*(v - Erev_nmda)*sfunc(v)
-
-	g_ampa = gbar_ampa*r_ampa * facfactor
-	:i_ampa = W_ampa*g_ampa*(v - Erev_ampa)  * (1 + (bACH * (ACH-1)))*(aDA + (bDA * (DA-1))) 
-	i_ampa = initW*g_ampa*(v - Erev_ampa)  * (1 + (bACH * (ACH-1)))*(aDA + (bDA * (DA-1))) 
-
-	ICa = P0*g_nmda*(v - ECa)*sfunc(v)
-	Capoolcon'= -fCa*Afactor*ICa + (Cainf-Capoolcon)/tauCa
+DERIVATIVE state{
+    A_AMPA' = -A_AMPA/tau_r_AMPA
+    B_AMPA' = -B_AMPA/tau_d_AMPA
+    A_NMDA' = -A_NMDA/tau_r_NMDA
+    B_NMDA' = -B_NMDA/tau_d_NMDA
 }
 
-NET_RECEIVE(dummy_weight) {
-	t0 = t :spike time for conductance opening
-	
-	:Added by Ali, Synaptic facilitation
-	F  = 1 + (F-1)* exp(-(t - tsyn)/tauF)
-	D1 = 1 - (1-D1)*exp(-(t - tsyn)/tauD1)
-	D2 = 1 - (1-D2)*exp(-(t - tsyn)/tauD2)
- :printf("%g\t%g\t%g\t%g\t%g\t%g\n", t, t-tsyn, F, D1, D2, facfactor)
-	tsyn = t
-	
-	facfactor = 1:  F * D1 * D2
-	
 
-	F = F * f
-	
-	if (F > 30) { 
-	F=30
-	}
-	D1 = D1 * d1
-	D2 = D2 * d2
-:printf("\t%g\t%g\t%g\n", F, D1, D2)
-	
+NET_RECEIVE (weight, weight_AMPA, weight_NMDA, R, Pr, u, tsyn (ms), nc_type){
+    LOCAL result
+    weight_AMPA = weight
+    weight_NMDA = weight * NMDA_ratio
+
+    INITIAL{
+        R=1
+        u=u0
+        tsyn=t
+    }
+
+    : Disable in case of t < 0 (in case of ForwardSkip) which causes numerical
+    : instability if synapses are activated.
+    if(t < 0 ) {
+    VERBATIM
+        return;
+    ENDVERBATIM
+    }
+
+    if (flag == 1) {
+        : self event to set next weight at delay
+          weight = conductance
+
+    }
+    : flag == 0, i.e. a spike has arrived
+
+    : calc u at event-
+    u = Use
+
+    Pr  = u * R                         :Pr is calculated as R * u (running value of Use)
 
 
+    :if( verboseLevel > 0 ) {
+        :printf("Synapse %f at time %g: R = %g Pr = %g erand = %g\n", synapseID, t, R, Pr, result )
+    :}
+
+    tsyn = t
+
+    A_AMPA = A_AMPA + Pr*weight_AMPA
+    B_AMPA = B_AMPA + Pr*weight_AMPA
+    A_NMDA = A_NMDA + Pr*weight_NMDA
+    B_NMDA = B_NMDA + Pr*weight_NMDA
+
+    if( verboseLevel > 0 ) {
+        printf( " vals %g %g %g %g\n", A_AMPA, weight_AMPA, weight )
+    }
 }
 
-:::::::::::: FUNCTIONs and PROCEDUREs ::::::::::::
 
-FUNCTION sfunc (v (mV)) {
-	UNITSOFF
-	sfunc = 1/(1+0.33*exp(-0.06*v))
-	UNITSON
-}
-
-FUNCTION eta(Cani (mM)) {
-	LOCAL taulearn, P1, P2, P4, Cacon
-	P1 = 0.1
-	P2 = P1*1e-4
-	P4 = 1
-	Cacon = Cani*1e3
-	taulearn = P1/(P2+Cacon*Cacon*Cacon)+P4
-	eta = 1/taulearn*0.001
-}
-
-FUNCTION omega(Cani (mM), threshold1 (uM), threshold2 (uM)) {
-	LOCAL r, mid, Cacon
-	Cacon = Cani*1e3
-	r = (threshold2-threshold1)/2
-	mid = (threshold1+threshold2)/2
-	if (Cacon <= threshold1) { omega = 0}
-	else if (Cacon >= threshold2) {	omega = 1/(1+50*exp(-50*(Cacon-threshold2)))}
-	else {omega = -sqrt(r*r-(Cacon-mid)*(Cacon-mid))}
+FUNCTION toggleVerbose() {
+    verboseLevel = 1-verboseLevel
 }

@@ -3,8 +3,9 @@
 
 
 if [ -d "output" ]; then
-	rm -rf "output"
-	mkdir "output"
+	echo "remove output"
+	rm -rf output
+	mkdir output
 fi
 
 

@@ -1,1 +1,9 @@
-{"level_of_detail": "chn2pyr", "AlphaTmax_gaba": "1.52", "Beta_gaba": "0.14", "Cdur_gaba": "0.7254", "gbar_gaba": "1.2", "Erev_gaba": "-50", "initW": "2", "initW_lognormal_mean": 2, "initW_lognormal_std": 0.15, "Wmax": "10", "Wmin": "0", "delay": "0.1", "con_pattern": "1", "lambda1": "1", "lambda2": "0.01", "threshold1": "0.5", "threshold2": "0.6", "tauD1": "40", "d1": "0.95", "tauD2": "70", "d2": "0.9", "tauF": "20", "f": "0"}
+{
+"level_of_detail": "chn2pyr",
+"gmax": "0.49",
+"initW": "3",
+"initW_lognormal_mean": 2,
+"initW_lognormal_std": 0.15,
+"tau_r_GABAA": 100,
+"tau_d_GABAA": 100
+}

@@ -29,7 +29,7 @@ extern double hoc_Exp(double);
 #define nrn_jacob _nrn_jacob__pyr2int
 #define nrn_state _nrn_state__pyr2int
 #define _net_receive _net_receive__pyr2int 
-#define release release__pyr2int 
+#define state state__pyr2int 
  
 #define _threadargscomma_ _p, _ppvar, _thread, _nt,
 #define _threadargsprotocomma_ double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt,
@@ -45,77 +45,39 @@ extern double hoc_Exp(double);
 #define t _nt->_t
 #define dt _nt->_dt
 #define initW _p[0]
-#define Cdur_nmda _p[1]
-#define AlphaTmax_nmda _p[2]
-#define Beta_nmda _p[3]
-#define Erev_nmda _p[4]
-#define gbar_nmda _p[5]
-#define Cdur_ampa _p[6]
-#define AlphaTmax_ampa _p[7]
-#define Beta_ampa _p[8]
-#define Erev_ampa _p[9]
-#define gbar_ampa _p[10]
-#define ECa _p[11]
-#define Cainf _p[12]
-#define pooldiam _p[13]
-#define z _p[14]
-#define tauCa _p[15]
-#define P0 _p[16]
-#define fCa _p[17]
-#define lambda1 _p[18]
-#define lambda2 _p[19]
-#define threshold1 _p[20]
-#define threshold2 _p[21]
-#define fmax _p[22]
-#define fmin _p[23]
-#define facfactor _p[24]
-#define f _p[25]
-#define tauF _p[26]
-#define d1 _p[27]
-#define tauD1 _p[28]
-#define d2 _p[29]
-#define tauD2 _p[30]
-#define aACH _p[31]
-#define bACH _p[32]
-#define wACH _p[33]
-#define aDA _p[34]
-#define bDA _p[35]
-#define wDA _p[36]
-#define i_nmda _p[37]
-#define g_nmda _p[38]
-#define on_nmda _p[39]
-#define W_nmda _p[40]
-#define i_ampa _p[41]
-#define g_ampa _p[42]
-#define on_ampa _p[43]
-#define W_ampa _p[44]
-#define ICa _p[45]
-#define iCatotal _p[46]
-#define Wmax _p[47]
-#define Wmin _p[48]
-#define maxChange _p[49]
-#define normW _p[50]
-#define scaleW _p[51]
-#define pregid _p[52]
-#define postgid _p[53]
-#define calcium _p[54]
-#define F _p[55]
-#define D1 _p[56]
-#define D2 _p[57]
-#define r_nmda _p[58]
-#define r_ampa _p[59]
-#define Capoolcon _p[60]
-#define t0 _p[61]
-#define Afactor _p[62]
-#define dW_ampa _p[63]
-#define tsyn _p[64]
-#define fa _p[65]
-#define Dr_nmda _p[66]
-#define Dr_ampa _p[67]
-#define DCapoolcon _p[68]
-#define v _p[69]
-#define _g _p[70]
-#define _tsav _p[71]
+#define tau_r_AMPA _p[1]
+#define tau_d_AMPA _p[2]
+#define tau_r_NMDA _p[3]
+#define tau_d_NMDA _p[4]
+#define Use _p[5]
+#define Dep _p[6]
+#define Fac _p[7]
+#define e _p[8]
+#define mg _p[9]
+#define gmax _p[10]
+#define u0 _p[11]
+#define NMDA_ratio _p[12]
+#define synapseID _p[13]
+#define verboseLevel _p[14]
+#define conductance _p[15]
+#define i _p[16]
+#define i_AMPA _p[17]
+#define i_NMDA _p[18]
+#define g_AMPA _p[19]
+#define g_NMDA _p[20]
+#define g _p[21]
+#define A_AMPA _p[22]
+#define B_AMPA _p[23]
+#define A_NMDA _p[24]
+#define B_NMDA _p[25]
+#define mggate _p[26]
+#define DA_AMPA _p[27]
+#define DB_AMPA _p[28]
+#define DA_NMDA _p[29]
+#define DB_NMDA _p[30]
+#define v _p[31]
+#define _g _p[32]
+#define _tsav _p[33]
 #define _nd_area  *_ppvar[0]._pval
  
 #if MAC
@@ -135,9 +97,7 @@ extern "C" {
  static Prop* _extcall_prop;
  /* external NEURON variables */
  /* declaration of user functions */
- static double _hoc_eta();
- static double _hoc_omega();
- static double _hoc_sfunc();
+ static double _hoc_toggleVerbose();
  static int _mechtype;
 extern void _nrn_cacheloop_reg(int, int);
 extern void hoc_register_prop_size(int, int, int);
@@ -185,73 +145,46 @@ extern void hoc_reg_nmodl_filename(int, const char*);
  "loc", _hoc_loc_pnt,
  "has_loc", _hoc_has_loc,
  "get_loc", _hoc_get_loc_pnt,
- "eta", _hoc_eta,
- "omega", _hoc_omega,
- "sfunc", _hoc_sfunc,
+ "toggleVerbose", _hoc_toggleVerbose,
  0, 0
 };
-#define eta eta_pyr2int
-#define omega omega_pyr2int
-#define sfunc sfunc_pyr2int
- extern double eta( _threadargsprotocomma_ double );
- extern double omega( _threadargsprotocomma_ double , double , double );
- extern double sfunc( _threadargsprotocomma_ double );
+#define toggleVerbose toggleVerbose_pyr2int
+ extern double toggleVerbose( _threadargsproto_ );
  /* declare global and static user variables */
-#define ACH ACH_pyr2int
- double ACH = 1;
-#define DA DA_pyr2int
- double DA = 1;
-#define LearningShutDown LearningShutDown_pyr2int
- double LearningShutDown = 1;
+#define nc_type_param nc_type_param_pyr2int
+ double nc_type_param = 7;
  /* some parameters have upper and lower limits */
  static HocParmLimits _hoc_parm_limits[] = {
- "d2", 0, 1,
- "d1", 0, 1,
- "f", 0, 1e+09,
- "tauD2", 1e-09, 1e+09,
- "tauD1", 1e-09, 1e+09,
- "tauF", 1e-09, 1e+09,
  0,0,0
 };
  static HocParmUnits _hoc_parm_units[] = {
- "Cdur_nmda", "ms",
- "AlphaTmax_nmda", "/ms",
- "Beta_nmda", "/ms",
- "Erev_nmda", "mV",
- "gbar_nmda", "uS",
- "Cdur_ampa", "ms",
- "AlphaTmax_ampa", "/ms",
- "Beta_ampa", "/ms",
- "Erev_ampa", "mV",
- "gbar_ampa", "uS",
- "Cainf", "mM",
- "pooldiam", "micrometer",
- "tauCa", "ms",
- "threshold1", "uM",
- "threshold2", "uM",
- "f", "1",
- "tauF", "ms",
- "d1", "1",
- "tauD1", "ms",
- "d2", "1",
- "tauD2", "ms",
- "i_nmda", "nA",
- "g_nmda", "uS",
- "i_ampa", "nA",
- "g_ampa", "uS",
- "ICa", "mA",
- "iCatotal", "mA",
+ "tau_r_AMPA", "ms",
+ "tau_d_AMPA", "ms",
+ "tau_r_NMDA", "ms",
+ "tau_d_NMDA", "ms",
+ "Use", "1",
+ "Dep", "ms",
+ "Fac", "ms",
+ "e", "mV",
+ "mg", "mM",
+ "gmax", "uS",
+ "NMDA_ratio", "1",
+ "i", "nA",
+ "i_AMPA", "nA",
+ "i_NMDA", "nA",
+ "g_AMPA", "uS",
+ "g_NMDA", "uS",
+ "g", "uS",
  0,0
 };
- static double Capoolcon0 = 0;
+ static double A_NMDA0 = 0;
+ static double A_AMPA0 = 0;
+ static double B_NMDA0 = 0;
+ static double B_AMPA0 = 0;
  static double delta_t = 0.01;
- static double r_ampa0 = 0;
- static double r_nmda0 = 0;
  /* connect global user variables to hoc */
  static DoubScal hoc_scdoub[] = {
- "ACH_pyr2int", &ACH_pyr2int,
- "DA_pyr2int", &DA_pyr2int,
- "LearningShutDown_pyr2int", &LearningShutDown_pyr2int,
+ "nc_type_param_pyr2int", &nc_type_param_pyr2int,
  0,0
 };
  static DoubVec hoc_vdoub[] = {
@@ -279,68 +212,33 @@ static void _ode_matsol(_NrnThread*, _Memb_list*, int);
  "7.7.0",
 "pyr2int",
  "initW",
- "Cdur_nmda",
- "AlphaTmax_nmda",
- "Beta_nmda",
- "Erev_nmda",
- "gbar_nmda",
- "Cdur_ampa",
- "AlphaTmax_ampa",
- "Beta_ampa",
- "Erev_ampa",
- "gbar_ampa",
- "ECa",
- "Cainf",
- "pooldiam",
- "z",
- "tauCa",
- "P0",
- "fCa",
- "lambda1",
- "lambda2",
- "threshold1",
- "threshold2",
- "fmax",
- "fmin",
- "facfactor",
- "f",
- "tauF",
- "d1",
- "tauD1",
- "d2",
- "tauD2",
- "aACH",
- "bACH",
- "wACH",
- "aDA",
- "bDA",
- "wDA",
+ "tau_r_AMPA",
+ "tau_d_AMPA",
+ "tau_r_NMDA",
+ "tau_d_NMDA",
+ "Use",
+ "Dep",
+ "Fac",
+ "e",
+ "mg",
+ "gmax",
+ "u0",
+ "NMDA_ratio",
+ "synapseID",
+ "verboseLevel",
+ "conductance",
  0,
- "i_nmda",
- "g_nmda",
- "on_nmda",
- "W_nmda",
- "i_ampa",
- "g_ampa",
- "on_ampa",
- "W_ampa",
- "ICa",
- "iCatotal",
- "Wmax",
- "Wmin",
- "maxChange",
- "normW",
- "scaleW",
- "pregid",
- "postgid",
- "calcium",
- "F",
- "D1",
- "D2",
+ "i",
+ "i_AMPA",
+ "i_NMDA",
+ "g_AMPA",
+ "g_NMDA",
+ "g",
  0,
- "r_nmda",
- "r_ampa",
- "Capoolcon",
+ "A_AMPA",
+ "B_AMPA",
+ "A_NMDA",
+ "B_NMDA",
  0,
  0};
  
@@ -354,48 +252,27 @@ static void nrn_alloc(Prop* _prop) {
 	_p = nrn_point_prop_->param;
 	_ppvar = nrn_point_prop_->dparam;
  }else{
- 	_p = nrn_prop_data_alloc(_mechtype, 72, _prop);
+ 	_p = nrn_prop_data_alloc(_mechtype, 34, _prop);
  	/*initialize range parameters*/
- 	initW = 5;
- 	Cdur_nmda = 17.58;
- 	AlphaTmax_nmda = 0.08;
- 	Beta_nmda = 0.008;
- 	Erev_nmda = 0;
- 	gbar_nmda = 0.0006;
- 	Cdur_ampa = 5.31;
- 	AlphaTmax_ampa = 0.117;
- 	Beta_ampa = 0.09;
- 	Erev_ampa = 0;
- 	gbar_ampa = 0.0017;
- 	ECa = 120;
- 	Cainf = 5e-05;
- 	pooldiam = 1.8172;
- 	z = 2;
- 	tauCa = 50;
- 	P0 = 0.015;
- 	fCa = 0.024;
- 	lambda1 = 2.5;
- 	lambda2 = 0.01;
- 	threshold1 = 0.2;
- 	threshold2 = 0.4;
- 	fmax = 3;
- 	fmin = 0.8;
- 	facfactor = 1;
- 	f = 1;
- 	tauF = 1;
- 	d1 = 1;
- 	tauD1 = 1;
- 	d2 = 1;
- 	tauD2 = 1;
- 	aACH = 1;
- 	bACH = 0;
- 	wACH = 0;
- 	aDA = 1;
- 	bDA = 0;
- 	wDA = 0;
+ 	initW = 1;
+ 	tau_r_AMPA = 1.5;
+ 	tau_d_AMPA = 1.7;
+ 	tau_r_NMDA = 1.5;
+ 	tau_d_NMDA = 20;
+ 	Use = 1;
+ 	Dep = 100;
+ 	Fac = 10;
+ 	e = 0;
+ 	mg = 1;
+ 	gmax = 0.45;
+ 	u0 = 0;
+ 	NMDA_ratio = 0.71;
+ 	synapseID = 0;
+ 	verboseLevel = 0;
+ 	conductance = 0;
   }
  	_prop->param = _p;
- 	_prop->param_size = 72;
+ 	_prop->param_size = 34;
   if (!nrn_point_prop_) {
  	_ppvar = nrn_prop_datum_alloc(_mechtype, 3, _prop);
   }
@@ -410,6 +287,7 @@ static void nrn_alloc(Prop* _prop) {
  0,0
 };
  static void _net_receive(Point_process*, double*, double);
+ static void _net_init(Point_process*, double*, double);
  extern Symbol* hoc_lookup(const char*);
 extern void _nrn_thread_reg(int, int, void(*)(Datum*));
 extern void _nrn_thread_table_reg(int, void(*)(double*, Datum*, Datum*, _NrnThread*, int));
@@ -429,23 +307,22 @@ extern void _cvode_abstol( Symbol**, double*, int);
   hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
   hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
 #endif
-  hoc_register_prop_size(_mechtype, 72, 3);
+  hoc_register_prop_size(_mechtype, 34, 3);
   hoc_register_dparam_semantics(_mechtype, 0, "area");
   hoc_register_dparam_semantics(_mechtype, 1, "pntproc");
   hoc_register_dparam_semantics(_mechtype, 2, "cvodeieq");
  	hoc_register_cvode(_mechtype, _ode_count, _ode_map, _ode_spec, _ode_matsol);
  	hoc_register_tolerance(_mechtype, _hoc_state_tol, &_atollist);
  pnt_receive[_mechtype] = _net_receive;
- pnt_receive_size[_mechtype] = 1;
+ pnt_receive_init[_mechtype] = _net_init;
+ pnt_receive_size[_mechtype] = 8;
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
  	ivoc_help("help ?1 pyr2int /home/dpd4k4/CA1_model/biophys_components/mechanisms/modfiles/pyr2int.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
- static double FARADAY = 96485.0;
- static double pi = 3.141592;
 static int _reset;
-static char *modelname = "";
+static char *modelname = "AMPA and NMDA receptor with presynaptic short-term plasticity";
 
 static int error;
 static int _ninits = 0;
@@ -454,154 +331,31 @@ static void _modl_cleanup(){ _match_recurse=1;}
  
 static int _ode_spec1(_threadargsproto_);
 /*static int _ode_matsol1(_threadargsproto_);*/
- static int _slist1[3], _dlist1[3];
- static int release(_threadargsproto_);
+ static int _slist1[4], _dlist1[4];
+ static int state(_threadargsproto_);
  
 /*CVODE*/
  static int _ode_spec1 (double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt) {int _reset = 0; {
-   if ( t0 > 0.0 ) {
-     if ( t - t0 < Cdur_nmda ) {
-       on_nmda = 1.0 ;
-       }
-     else {
-       on_nmda = 0.0 ;
-       }
-     if ( t - t0 < Cdur_ampa ) {
-       on_ampa = 1.0 ;
-       }
-     else {
-       on_ampa = 0.0 ;
-       }
-     }
-   Dr_nmda = AlphaTmax_nmda * on_nmda * ( 1.0 - r_nmda ) - Beta_nmda * r_nmda ;
-   Dr_ampa = AlphaTmax_ampa * on_ampa * ( 1.0 - r_ampa ) - Beta_ampa * r_ampa ;
-   dW_ampa = eta ( _threadargscomma_ Capoolcon ) * ( lambda1 * omega ( _threadargscomma_ Capoolcon , threshold1 , threshold2 ) - lambda2 * W_ampa ) * dt ;
-   if ( fabs ( dW_ampa ) > maxChange ) {
-     if ( dW_ampa < 0.0 ) {
-       dW_ampa = - 1.0 * maxChange ;
-       }
-     else {
-       dW_ampa = maxChange ;
-       }
-     }
-   normW = ( W_ampa - Wmin ) / ( Wmax - Wmin ) ;
-   if ( dW_ampa < 0.0 ) {
-     scaleW = sqrt ( fabs ( normW ) ) ;
-     }
-   else {
-     scaleW = sqrt ( fabs ( 1.0 - normW ) ) ;
-     }
-   W_ampa = W_ampa + dW_ampa * scaleW * ( 1.0 + ( wACH * ( ACH - 1.0 ) ) ) * LearningShutDown ;
-   if ( W_ampa > Wmax ) {
-     W_ampa = Wmax ;
-     }
-   else if ( W_ampa < Wmin ) {
-     W_ampa = Wmin ;
-     }
-   g_nmda = gbar_nmda * r_nmda * facfactor ;
-   i_nmda = initW * g_nmda * ( v - Erev_nmda ) * sfunc ( _threadargscomma_ v ) ;
-   g_ampa = gbar_ampa * r_ampa * facfactor ;
-   i_ampa = initW * g_ampa * ( v - Erev_ampa ) * ( 1.0 + ( bACH * ( ACH - 1.0 ) ) ) * ( aDA + ( bDA * ( DA - 1.0 ) ) ) ;
-   ICa = P0 * g_nmda * ( v - ECa ) * sfunc ( _threadargscomma_ v ) ;
-   DCapoolcon = - fCa * Afactor * ICa + ( Cainf - Capoolcon ) / tauCa ;
+   DA_AMPA = - A_AMPA / tau_r_AMPA ;
+   DB_AMPA = - B_AMPA / tau_d_AMPA ;
+   DA_NMDA = - A_NMDA / tau_r_NMDA ;
+   DB_NMDA = - B_NMDA / tau_d_NMDA ;
    }
  return _reset;
 }
  static int _ode_matsol1 (double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt) {
- if ( t0 > 0.0 ) {
-   if ( t - t0 < Cdur_nmda ) {
-     on_nmda = 1.0 ;
-     }
-   else {
-     on_nmda = 0.0 ;
-     }
-   if ( t - t0 < Cdur_ampa ) {
-     on_ampa = 1.0 ;
-     }
-   else {
-     on_ampa = 0.0 ;
-     }
-   }
- Dr_nmda = Dr_nmda  / (1. - dt*( ( AlphaTmax_nmda * on_nmda )*( ( ( - 1.0 ) ) ) - ( Beta_nmda )*( 1.0 ) )) ;
- Dr_ampa = Dr_ampa  / (1. - dt*( ( AlphaTmax_ampa * on_ampa )*( ( ( - 1.0 ) ) ) - ( Beta_ampa )*( 1.0 ) )) ;
- dW_ampa = eta ( _threadargscomma_ Capoolcon ) * ( lambda1 * omega ( _threadargscomma_ Capoolcon , threshold1 , threshold2 ) - lambda2 * W_ampa ) * dt ;
- if ( fabs ( dW_ampa ) > maxChange ) {
-   if ( dW_ampa < 0.0 ) {
-     dW_ampa = - 1.0 * maxChange ;
-     }
-   else {
-     dW_ampa = maxChange ;
-     }
-   }
- normW = ( W_ampa - Wmin ) / ( Wmax - Wmin ) ;
- if ( dW_ampa < 0.0 ) {
-   scaleW = sqrt ( fabs ( normW ) ) ;
-   }
- else {
-   scaleW = sqrt ( fabs ( 1.0 - normW ) ) ;
-   }
- W_ampa = W_ampa + dW_ampa * scaleW * ( 1.0 + ( wACH * ( ACH - 1.0 ) ) ) * LearningShutDown ;
- if ( W_ampa > Wmax ) {
-   W_ampa = Wmax ;
-   }
- else if ( W_ampa < Wmin ) {
-   W_ampa = Wmin ;
-   }
- g_nmda = gbar_nmda * r_nmda * facfactor ;
- i_nmda = initW * g_nmda * ( v - Erev_nmda ) * sfunc ( _threadargscomma_ v ) ;
- g_ampa = gbar_ampa * r_ampa * facfactor ;
- i_ampa = initW * g_ampa * ( v - Erev_ampa ) * ( 1.0 + ( bACH * ( ACH - 1.0 ) ) ) * ( aDA + ( bDA * ( DA - 1.0 ) ) ) ;
- ICa = P0 * g_nmda * ( v - ECa ) * sfunc ( _threadargscomma_ v ) ;
- DCapoolcon = DCapoolcon  / (1. - dt*( ( ( ( - 1.0 ) ) ) / tauCa )) ;
+ DA_AMPA = DA_AMPA  / (1. - dt*( ( - 1.0 ) / tau_r_AMPA )) ;
+ DB_AMPA = DB_AMPA  / (1. - dt*( ( - 1.0 ) / tau_d_AMPA )) ;
+ DA_NMDA = DA_NMDA  / (1. - dt*( ( - 1.0 ) / tau_r_NMDA )) ;
+ DB_NMDA = DB_NMDA  / (1. - dt*( ( - 1.0 ) / tau_d_NMDA )) ;
   return 0;
 }
  /*END CVODE*/
- static int release (double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt) { {
-   if ( t0 > 0.0 ) {
-     if ( t - t0 < Cdur_nmda ) {
-       on_nmda = 1.0 ;
-       }
-     else {
-       on_nmda = 0.0 ;
-       }
-     if ( t - t0 < Cdur_ampa ) {
-       on_ampa = 1.0 ;
-       }
-     else {
-       on_ampa = 0.0 ;
-       }
-     }
-    r_nmda = r_nmda + (1. - exp(dt*(( AlphaTmax_nmda * on_nmda )*( ( ( - 1.0 ) ) ) - ( Beta_nmda )*( 1.0 ))))*(- ( ( ( AlphaTmax_nmda )*( on_nmda ) )*( ( 1.0 ) ) ) / ( ( ( AlphaTmax_nmda )*( on_nmda ) )*( ( ( - 1.0 ) ) ) - ( Beta_nmda )*( 1.0 ) ) - r_nmda) ;
-    r_ampa = r_ampa + (1. - exp(dt*(( AlphaTmax_ampa * on_ampa )*( ( ( - 1.0 ) ) ) - ( Beta_ampa )*( 1.0 ))))*(- ( ( ( AlphaTmax_ampa )*( on_ampa ) )*( ( 1.0 ) ) ) / ( ( ( AlphaTmax_ampa )*( on_ampa ) )*( ( ( - 1.0 ) ) ) - ( Beta_ampa )*( 1.0 ) ) - r_ampa) ;
-   dW_ampa = eta ( _threadargscomma_ Capoolcon ) * ( lambda1 * omega ( _threadargscomma_ Capoolcon , threshold1 , threshold2 ) - lambda2 * W_ampa ) * dt ;
-   if ( fabs ( dW_ampa ) > maxChange ) {
-     if ( dW_ampa < 0.0 ) {
-       dW_ampa = - 1.0 * maxChange ;
-       }
-     else {
-       dW_ampa = maxChange ;
-       }
-     }
-   normW = ( W_ampa - Wmin ) / ( Wmax - Wmin ) ;
-   if ( dW_ampa < 0.0 ) {
-     scaleW = sqrt ( fabs ( normW ) ) ;
-     }
-   else {
-     scaleW = sqrt ( fabs ( 1.0 - normW ) ) ;
-     }
-   W_ampa = W_ampa + dW_ampa * scaleW * ( 1.0 + ( wACH * ( ACH - 1.0 ) ) ) * LearningShutDown ;
-   if ( W_ampa > Wmax ) {
-     W_ampa = Wmax ;
-     }
-   else if ( W_ampa < Wmin ) {
-     W_ampa = Wmin ;
-     }
-   g_nmda = gbar_nmda * r_nmda * facfactor ;
-   i_nmda = initW * g_nmda * ( v - Erev_nmda ) * sfunc ( _threadargscomma_ v ) ;
-   g_ampa = gbar_ampa * r_ampa * facfactor ;
-   i_ampa = initW * g_ampa * ( v - Erev_ampa ) * ( 1.0 + ( bACH * ( ACH - 1.0 ) ) ) * ( aDA + ( bDA * ( DA - 1.0 ) ) ) ;
-   ICa = P0 * g_nmda * ( v - ECa ) * sfunc ( _threadargscomma_ v ) ;
-    Capoolcon = Capoolcon + (1. - exp(dt*(( ( ( - 1.0 ) ) ) / tauCa)))*(- ( ( ( - fCa )*( Afactor ) )*( ICa ) + ( ( Cainf ) ) / tauCa ) / ( ( ( ( - 1.0 ) ) ) / tauCa ) - Capoolcon) ;
+ static int state (double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt) { {
+    A_AMPA = A_AMPA + (1. - exp(dt*(( - 1.0 ) / tau_r_AMPA)))*(- ( 0.0 ) / ( ( - 1.0 ) / tau_r_AMPA ) - A_AMPA) ;
+    B_AMPA = B_AMPA + (1. - exp(dt*(( - 1.0 ) / tau_d_AMPA)))*(- ( 0.0 ) / ( ( - 1.0 ) / tau_d_AMPA ) - B_AMPA) ;
+    A_NMDA = A_NMDA + (1. - exp(dt*(( - 1.0 ) / tau_r_NMDA)))*(- ( 0.0 ) / ( ( - 1.0 ) / tau_r_NMDA ) - A_NMDA) ;
+    B_NMDA = B_NMDA + (1. - exp(dt*(( - 1.0 ) / tau_d_NMDA)))*(- ( 0.0 ) / ( ( - 1.0 ) / tau_d_NMDA ) - B_NMDA) ;
    }
   return 0;
 }
@@ -611,93 +365,90 @@ static void _net_receive (_pnt, _args, _lflag) Point_process* _pnt; double* _arg
    _thread = (Datum*)0; _nt = (_NrnThread*)_pnt->_vnt;   _p = _pnt->_prop->param; _ppvar = _pnt->_prop->dparam;
   if (_tsav > t){ extern char* hoc_object_name(); hoc_execerror(hoc_object_name(_pnt->ob), ":Event arrived out of order. Must call ParallelContext.set_maxstep AFTER assigning minimum NetCon.delay");}
  _tsav = t; {
-   t0 = t ;
-   F = 1.0 + ( F - 1.0 ) * exp ( - ( t - tsyn ) / tauF ) ;
-   D1 = 1.0 - ( 1.0 - D1 ) * exp ( - ( t - tsyn ) / tauD1 ) ;
-   D2 = 1.0 - ( 1.0 - D2 ) * exp ( - ( t - tsyn ) / tauD2 ) ;
-   tsyn = t ;
-   facfactor = 1.0 ;
-   F = F * f ;
-   if ( F > 30.0 ) {
-     F = 30.0 ;
+   double _lresult ;
+ _args[1] = _args[0] ;
+   _args[2] = _args[0] * NMDA_ratio ;
+   if ( t < 0.0 ) {
+     
+/*VERBATIM*/
+        return;
+ }
+   if ( _lflag  == 1.0 ) {
+     _args[0] = conductance ;
      }
-   D1 = D1 * d1 ;
-   D2 = D2 * d2 ;
+   _args[5] = Use ;
+   _args[4] = _args[5] * _args[3] ;
+   _args[6] = t ;
+     if (nrn_netrec_state_adjust && !cvode_active_){
+    /* discon state adjustment for cnexp case (rate uses no local variable) */
+    double __state = A_AMPA;
+    double __primary = (A_AMPA + _args[4] * _args[1]) - __state;
+     __primary += ( 1. - exp( 0.5*dt*( ( - 1.0 ) / tau_r_AMPA ) ) )*( - ( 0.0 ) / ( ( - 1.0 ) / tau_r_AMPA ) - __primary );
+    A_AMPA += __primary;
+  } else {
+ A_AMPA = A_AMPA + _args[4] * _args[1] ;
+     }
+   if (nrn_netrec_state_adjust && !cvode_active_){
+    /* discon state adjustment for cnexp case (rate uses no local variable) */
+    double __state = B_AMPA;
+    double __primary = (B_AMPA + _args[4] * _args[1]) - __state;
+     __primary += ( 1. - exp( 0.5*dt*( ( - 1.0 ) / tau_d_AMPA ) ) )*( - ( 0.0 ) / ( ( - 1.0 ) / tau_d_AMPA ) - __primary );
+    B_AMPA += __primary;
+  } else {
+ B_AMPA = B_AMPA + _args[4] * _args[1] ;
+     }
+   if (nrn_netrec_state_adjust && !cvode_active_){
+    /* discon state adjustment for cnexp case (rate uses no local variable) */
+    double __state = A_NMDA;
+    double __primary = (A_NMDA + _args[4] * _args[2]) - __state;
+     __primary += ( 1. - exp( 0.5*dt*( ( - 1.0 ) / tau_r_NMDA ) ) )*( - ( 0.0 ) / ( ( - 1.0 ) / tau_r_NMDA ) - __primary );
+    A_NMDA += __primary;
+  } else {
+ A_NMDA = A_NMDA + _args[4] * _args[2] ;
+     }
+   if (nrn_netrec_state_adjust && !cvode_active_){
+    /* discon state adjustment for cnexp case (rate uses no local variable) */
+    double __state = B_NMDA;
+    double __primary = (B_NMDA + _args[4] * _args[2]) - __state;
+     __primary += ( 1. - exp( 0.5*dt*( ( - 1.0 ) / tau_d_NMDA ) ) )*( - ( 0.0 ) / ( ( - 1.0 ) / tau_d_NMDA ) - __primary );
+    B_NMDA += __primary;
+  } else {
+ B_NMDA = B_NMDA + _args[4] * _args[2] ;
+     }
+ if ( verboseLevel > 0.0 ) {
+     printf ( " vals %g %g %g %g\n" , A_AMPA , _args[1] , _args[0] ) ;
+     }
    } }
  
-double sfunc ( _threadargsprotocomma_ double _lv ) {
-   double _lsfunc;
-  _lsfunc = 1.0 / ( 1.0 + 0.33 * exp ( - 0.06 * _lv ) ) ;
-    
-return _lsfunc;
- }
+static void _net_init(Point_process* _pnt, double* _args, double _lflag) {
+       double* _p = _pnt->_prop->param;
+    Datum* _ppvar = _pnt->_prop->dparam;
+    Datum* _thread = (Datum*)0;
+    _NrnThread* _nt = (_NrnThread*)_pnt->_vnt;
+ _args[3] = 1.0 ;
+   _args[5] = u0 ;
+   _args[6] = t ;
+   }
  
-static double _hoc_sfunc(void* _vptr) {
- double _r;
-   double* _p; Datum* _ppvar; Datum* _thread; _NrnThread* _nt;
-   _p = ((Point_process*)_vptr)->_prop->param;
-  _ppvar = ((Point_process*)_vptr)->_prop->dparam;
-  _thread = _extcall_thread;
-  _nt = (_NrnThread*)((Point_process*)_vptr)->_vnt;
- _r =  sfunc ( _p, _ppvar, _thread, _nt, *getarg(1) );
- return(_r);
-}
- 
-double eta ( _threadargsprotocomma_ double _lCani ) {
-   double _leta;
- double _ltaulearn , _lP1 , _lP2 , _lP4 , _lCacon ;
- _lP1 = 0.1 ;
-   _lP2 = _lP1 * 1e-4 ;
-   _lP4 = 1.0 ;
-   _lCacon = _lCani * 1e3 ;
-   _ltaulearn = _lP1 / ( _lP2 + _lCacon * _lCacon * _lCacon ) + _lP4 ;
-   _leta = 1.0 / _ltaulearn * 0.001 ;
+double toggleVerbose ( _threadargsproto_ ) {
+   double _ltoggleVerbose;
+ verboseLevel = 1.0 - verboseLevel ;
    
-return _leta;
+return _ltoggleVerbose;
  }
  
-static double _hoc_eta(void* _vptr) {
+static double _hoc_toggleVerbose(void* _vptr) {
  double _r;
    double* _p; Datum* _ppvar; Datum* _thread; _NrnThread* _nt;
    _p = ((Point_process*)_vptr)->_prop->param;
   _ppvar = ((Point_process*)_vptr)->_prop->dparam;
   _thread = _extcall_thread;
   _nt = (_NrnThread*)((Point_process*)_vptr)->_vnt;
- _r =  eta ( _p, _ppvar, _thread, _nt, *getarg(1) );
+ _r =  toggleVerbose ( _p, _ppvar, _thread, _nt );
  return(_r);
 }
  
-double omega ( _threadargsprotocomma_ double _lCani , double _lthreshold1 , double _lthreshold2 ) {
-   double _lomega;
- double _lr , _lmid , _lCacon ;
- _lCacon = _lCani * 1e3 ;
-   _lr = ( _lthreshold2 - _lthreshold1 ) / 2.0 ;
-   _lmid = ( _lthreshold1 + _lthreshold2 ) / 2.0 ;
-   if ( _lCacon <= _lthreshold1 ) {
-     _lomega = 0.0 ;
-     }
-   else if ( _lCacon >= _lthreshold2 ) {
-     _lomega = 1.0 / ( 1.0 + 50.0 * exp ( - 50.0 * ( _lCacon - _lthreshold2 ) ) ) ;
-     }
-   else {
-     _lomega = - sqrt ( _lr * _lr - ( _lCacon - _lmid ) * ( _lCacon - _lmid ) ) ;
-     }
-   
-return _lomega;
- }
- 
-static double _hoc_omega(void* _vptr) {
- double _r;
-   double* _p; Datum* _ppvar; Datum* _thread; _NrnThread* _nt;
-   _p = ((Point_process*)_vptr)->_prop->param;
-  _ppvar = ((Point_process*)_vptr)->_prop->dparam;
-  _thread = _extcall_thread;
-  _nt = (_NrnThread*)((Point_process*)_vptr)->_vnt;
- _r =  omega ( _p, _ppvar, _thread, _nt, *getarg(1) , *getarg(2) , *getarg(3) );
- return(_r);
-}
- 
-static int _ode_count(int _type){ return 3;}
+static int _ode_count(int _type){ return 4;}
  
 static void _ode_spec(_NrnThread* _nt, _Memb_list* _ml, int _type) {
    double* _p; Datum* _ppvar; Datum* _thread;
@@ -715,7 +466,7 @@ static void _ode_map(int _ieq, double** _pv, double** _pvdot, double* _pp, Datum
 	double* _p; Datum* _ppvar;
  	int _i; _p = _pp; _ppvar = _ppd;
 	_cvode_ieq = _ieq;
-	for (_i=0; _i < 3; ++_i) {
+	for (_i=0; _i < 4; ++_i) {
 		_pv[_i] = _pp + _slist1[_i];  _pvdot[_i] = _pp + _dlist1[_i];
 		_cvode_abstol(_atollist, _atol, _i);
 	}
@@ -739,26 +490,18 @@ static void _ode_matsol(_NrnThread* _nt, _Memb_list* _ml, int _type) {
 
 static void initmodel(double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt) {
   int _i; double _save;{
-  Capoolcon = Capoolcon0;
-  r_ampa = r_ampa0;
-  r_nmda = r_nmda0;
+  A_NMDA = A_NMDA0;
+  A_AMPA = A_AMPA0;
+  B_NMDA = B_NMDA0;
+  B_AMPA = B_AMPA0;
  {
-   on_nmda = 0.0 ;
-   r_nmda = 0.0 ;
-   W_nmda = initW ;
-   on_ampa = 0.0 ;
-   r_ampa = 0.0 ;
-   W_ampa = initW ;
-   t0 = - 1.0 ;
-   maxChange = ( Wmax - Wmin ) / 10.0 ;
-   dW_ampa = 0.0 ;
-   Capoolcon = Cainf ;
-   Afactor = 1.0 / ( z * FARADAY * 4.0 / 3.0 * pi * pow( ( pooldiam / 2.0 ) , 3.0 ) ) * ( 1e6 ) ;
-   tsyn = - 1e30 ;
-   fa = 0.0 ;
-   F = 1.0 ;
-   D1 = 1.0 ;
-   D2 = 1.0 ;
+   double _ltp_AMPA , _ltp_NMDA ;
+ A_AMPA = 0.0 ;
+   B_AMPA = 0.0 ;
+   A_NMDA = 0.0 ;
+   B_NMDA = 0.0 ;
+   _ltp_AMPA = ( tau_r_AMPA * tau_d_AMPA ) / ( tau_d_AMPA - tau_r_AMPA ) * log ( tau_d_AMPA / tau_r_AMPA ) ;
+   _ltp_NMDA = ( tau_r_NMDA * tau_d_NMDA ) / ( tau_d_NMDA - tau_r_NMDA ) * log ( tau_d_NMDA / tau_r_NMDA ) ;
    }
  
 }
@@ -790,9 +533,15 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
 }
 
 static double _nrn_current(double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt, double _v){double _current=0.;v=_v;{ {
+   mggate = 1.0 / ( 1.0 + exp ( 0.062 * - ( v ) ) * ( mg / 3.57 ) ) ;
+   g_AMPA = gmax * ( B_AMPA - A_AMPA ) ;
+   g_NMDA = gmax * ( B_NMDA - A_NMDA ) * mggate ;
+   g = g_AMPA + g_NMDA ;
+   i_AMPA = g_AMPA * ( v - e ) * initW ;
+   i_NMDA = g_NMDA * ( v - e ) * initW ;
+   i = i_AMPA + i_NMDA ;
    }
- _current += i_nmda;
- _current += i_ampa;
+ _current += i;
 
 } return _current;
 }
@@ -881,7 +630,7 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
   }
  v=_v;
 {
- {   release(_p, _ppvar, _thread, _nt);
+ {   state(_p, _ppvar, _thread, _nt);
   }}}
 
 }
@@ -892,9 +641,10 @@ static void _initlists(){
  double _x; double* _p = &_x;
  int _i; static int _first = 1;
   if (!_first) return;
- _slist1[0] = &(r_nmda) - _p;  _dlist1[0] = &(Dr_nmda) - _p;
- _slist1[1] = &(r_ampa) - _p;  _dlist1[1] = &(Dr_ampa) - _p;
- _slist1[2] = &(Capoolcon) - _p;  _dlist1[2] = &(DCapoolcon) - _p;
+ _slist1[0] = &(A_AMPA) - _p;  _dlist1[0] = &(DA_AMPA) - _p;
+ _slist1[1] = &(B_AMPA) - _p;  _dlist1[1] = &(DB_AMPA) - _p;
+ _slist1[2] = &(A_NMDA) - _p;  _dlist1[2] = &(DA_NMDA) - _p;
+ _slist1[3] = &(B_NMDA) - _p;  _dlist1[3] = &(DB_NMDA) - _p;
 _first = 0;
 }
 
@@ -905,275 +655,177 @@ _first = 0;
 #if NMODL_TEXT
 static const char* nmodl_filename = "/home/dpd4k4/CA1_model/biophys_components/mechanisms/modfiles/pyr2int.mod";
 static const char* nmodl_file_text = 
+  "COMMENT\n"
+  "/**\n"
+  " * @file DetAMPANMDA.mod\n"
+  " * @brief Adapted from ProbAMPANMDA_EMS.mod by Eilif, Michael and Srikanth\n"
+  " * @author chindemi\n"
+  " * @date 2014-05-25\n"
+  " * @remark Copyright (c) BBP/EPFL 2005-2021. This work is licenced under Creative Common CC BY-NC-SA-4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/)\n"
+  "* Several changes have been made from the orginal version of this synapse by Greg Glickert to better adapt the model for Large Scale BMTk/Neuron models\n"
+  " */\n"
+  "ENDCOMMENT\n"
+  "\n"
+  "\n"
+  "TITLE AMPA and NMDA receptor with presynaptic short-term plasticity\n"
+  "\n"
+  "\n"
+  "COMMENT\n"
+  "AMPA and NMDA receptor conductance using a dual-exponential profile\n"
+  "presynaptic short-term plasticity based on Fuhrmann et al. 2002, deterministic\n"
+  "version.\n"
+  "ENDCOMMENT\n"
+  "\n"
+  "\n"
   "NEURON {\n"
-  "	POINT_PROCESS pyr2int\n"
-  "	NONSPECIFIC_CURRENT i_nmda, i_ampa\n"
-  "	RANGE initW\n"
-  "	RANGE Cdur_nmda, AlphaTmax_nmda, Beta_nmda, Erev_nmda, gbar_nmda, W_nmda, on_nmda, g_nmda\n"
-  "	RANGE Cdur_ampa, AlphaTmax_ampa, Beta_ampa, Erev_ampa, gbar_ampa, W_ampa, on_ampa, g_ampa\n"
-  "	RANGE ECa, ICa, P0, fCa, tauCa, iCatotal\n"
-  "	RANGE Cainf, pooldiam, z\n"
-  "	RANGE lambda1, lambda2, threshold1, threshold2\n"
-  "	RANGE fmax, fmin, Wmax, Wmin, maxChange, normW, scaleW\n"
-  "	RANGE pregid,postgid\n"
-  "	\n"
-  "	:Added by Ali\n"
-  "	RANGE F, f, tauF, D1, d1, tauD1, D2, d2, tauD2\n"
-  "	RANGE facfactor\n"
-  "	RANGE aACH, bACH, aDA, bDA, wACH, wDA, calcium\n"
+  "    THREADSAFE\n"
+  "\n"
+  "    POINT_PROCESS pyr2int\n"
+  "    RANGE initW     : synaptic scaler for large scale networks added by Greg\n"
+  "    RANGE tau_r_AMPA, tau_d_AMPA, tau_r_NMDA, tau_d_NMDA\n"
+  "    RANGE Use, u, Dep, Fac, u0, mg, NMDA_ratio\n"
+  "    RANGE i, i_AMPA, i_NMDA, g_AMPA, g_NMDA, g, e,gmax\n"
+  "    NONSPECIFIC_CURRENT i\n"
+  "    RANGE synapseID, verboseLevel\n"
+  "    RANGE conductance\n"
+  "    GLOBAL nc_type_param\n"
+  "    : For debugging\n"
+  "    :RANGE sgid, tgid\n"
   "}\n"
   "\n"
-  "UNITS {\n"
-  "	(mV) = (millivolt)\n"
-  "        (nA) = (nanoamp)\n"
-  "	(uS) = (microsiemens)\n"
-  "	FARADAY = 96485 (coul)\n"
-  "	pi = 3.141592 (1)\n"
-  "}\n"
   "\n"
   "PARAMETER {\n"
-  ": parameters are vars assigned by user or changed by hoc. THey appear in nrnpointmenu\n"
-  "	initW = 5\n"
-  "\n"
-  "	Cdur_nmda = 17.58 (ms)\n"
-  "	AlphaTmax_nmda = .08 (/ms)\n"
-  "	Beta_nmda = 0.008 (/ms)\n"
-  "	Erev_nmda = 0 (mV)\n"
-  "	gbar_nmda = .6e-3 (uS)\n"
-  "\n"
-  "	Cdur_ampa = 5.31 (ms)\n"
-  "	AlphaTmax_ampa = 0.117 (/ms)\n"
-  "	Beta_ampa = 0.090 (/ms)\n"
-  "	Erev_ampa = 0 (mV)\n"
-  "	gbar_ampa = 1.7e-3 (uS)\n"
-  "\n"
-  "	ECa = 120\n"
-  "\n"
-  "	Cainf = 50e-6 (mM)\n"
-  "	pooldiam =  1.8172 (micrometer)\n"
-  "	z = 2\n"
-  "\n"
-  "	tauCa = 50 (ms)\n"
-  "	P0 = .015\n"
-  "	fCa = .024\n"
-  "\n"
-  "	lambda1 = 2.5\n"
-  "	lambda2 = .01\n"
-  "	threshold1 = 0.2 (uM)\n"
-  "	threshold2 = 0.4 (uM)\n"
-  "\n"
-  "	fmax = 3\n"
-  "	fmin = .8\n"
-  "\n"
-  "	:Added by Ali\n"
-  "	ACH = 1\n"
-  "	DA = 1\n"
-  "	LearningShutDown = 1\n"
-  "\n"
-  "	facfactor = 1\n"
-  "	: the (1) is needed for the range limits to be effective\n"
-  "        f = 1 (1) < 0, 1e9 >    : facilitation\n"
-  "        tauF = 1 (ms) < 1e-9, 1e9 >\n"
-  "        d1 = 1 (1) < 0, 1 >     : fast depression\n"
-  "        tauD1 = 1 (ms) < 1e-9, 1e9 >\n"
-  "        d2 = 1 (1) < 0, 1 >     : slow depression\n"
-  "        tauD2 = 1 (ms) < 1e-9, 1e9 >\n"
-  "		\n"
-  "	aACH = 1\n"
-  "	bACH = 0\n"
-  "	wACH = 0\n"
-  "	aDA = 1\n"
-  "	bDA = 0\n"
-  "	wDA = 0\n"
+  "    initW         = 1.0      : added by Greg Glickert to scale synaptic weight for large scale modeling\n"
+  "    tau_r_AMPA = 1.5   (ms)  : Dual-exponential conductance profile\n"
+  "    tau_d_AMPA = 1.7   (ms)  : IMPORTANT: tau_r < tau_d\n"
+  "    tau_r_NMDA = 1.5\n"
+  "      (ms)  : Dual-exponential conductance profile\n"
+  "    tau_d_NMDA = 20    (ms)  : IMPORTANT: tau_r < tau_d\n"
+  "    Use = 1.0          (1)   : Utilization of synaptic efficacy\n"
+  "    Dep = 100          (ms)  : Relaxation time constant from depression\n"
+  "    Fac = 10           (ms)  : Relaxation time constant from facilitation\n"
+  "    e = 0              (mV)  : AMPA and NMDA reversal potential\n"
+  "    mg = 1             (mM)  : Initial concentration of mg2+\n"
+  "    gmax = .45        (uS)  : Weight conversion factor (from nS to uS)\n"
+  "    u0 = 0                   : Initial value of u, which is the running value of Use\n"
+  "    NMDA_ratio = 0.71  (1)   : The ratio of NMDA to AMPA\n"
+  "    synapseID = 0\n"
+  "    verboseLevel = 0\n"
+  "    conductance = 0.0\n"
+  "    nc_type_param = 7\n"
   "\n"
   "}\n"
+  "\n"
   "\n"
   "ASSIGNED {\n"
-  ": These are vars calculated by Neuron hoc or by the mechanism mod itself\n"
-  "	v (mV)\n"
+  "    v (mV)\n"
+  "    i (nA)\n"
+  "    i_AMPA (nA)\n"
+  "    i_NMDA (nA)\n"
+  "    g_AMPA (uS)\n"
+  "    g_NMDA (uS)\n"
+  "    g (uS)\n"
   "\n"
-  "	i_nmda (nA)\n"
-  "	g_nmda (uS)\n"
-  "	on_nmda\n"
-  "	W_nmda\n"
-  "\n"
-  "	i_ampa (nA)\n"
-  "	g_ampa (uS)\n"
-  "	on_ampa\n"
-  "	W_ampa\n"
-  "\n"
-  "	t0 (ms)\n"
-  "\n"
-  "	ICa (mA)\n"
-  "	Afactor	(mM/ms/nA)\n"
-  "	iCatotal (mA)\n"
-  "\n"
-  "	dW_ampa\n"
-  "	Wmax\n"
-  "	Wmin\n"
-  "	maxChange\n"
-  "	normW\n"
-  "	scaleW\n"
-  "	\n"
-  "	pregid\n"
-  "	postgid\n"
-  "	\n"
-  "	:Added by Ali\n"
-  "		calcium\n"
-  "\n"
-  "		tsyn\n"
-  "	\n"
-  "		fa\n"
-  "		F\n"
-  "		D1\n"
-  "		D2\n"
-  "		\n"
+  "    mggate\n"
   "}\n"
   "\n"
-  "STATE { r_nmda r_ampa Capoolcon }\n"
   "\n"
-  "INITIAL {\n"
-  "	on_nmda = 0\n"
-  "	r_nmda = 0\n"
-  "	W_nmda = initW\n"
+  "STATE {\n"
+  "    A_AMPA       : AMPA state variable to construct the dual-exponential profile - decays with conductance tau_r_AMPA\n"
+  "    B_AMPA       : AMPA state variable to construct the dual-exponential profile - decays with conductance tau_d_AMPA\n"
+  "    A_NMDA       : NMDA state variable to construct the dual-exponential profile - decays with conductance tau_r_NMDA\n"
+  "    B_NMDA       : NMDA state variable to construct the dual-exponential profile - decays with conductance tau_d_NMDA\n"
+  "}\n"
   "\n"
-  "	on_ampa = 0\n"
-  "	r_ampa = 0\n"
-  "	W_ampa = initW\n"
   "\n"
-  "	t0 = -1\n"
+  "INITIAL{\n"
+  "    LOCAL tp_AMPA, tp_NMDA\n"
   "\n"
-  "	:Wmax = 2*initW\n"
-  "	:Wmin = 0.25*initW\n"
-  "	maxChange = (Wmax-Wmin)/10\n"
-  "	dW_ampa = 0\n"
+  "    A_AMPA = 0\n"
+  "    B_AMPA = 0\n"
   "\n"
-  "	Capoolcon = Cainf\n"
-  "	Afactor	= 1/(z*FARADAY*4/3*pi*(pooldiam/2)^3)*(1e6)\n"
-  "	\n"
-  "	:Added by Ali\n"
+  "    A_NMDA = 0\n"
+  "    B_NMDA = 0\n"
   "\n"
-  "		tsyn = -1e30\n"
+  "    tp_AMPA = (tau_r_AMPA*tau_d_AMPA)/(tau_d_AMPA-tau_r_AMPA)*log(tau_d_AMPA/tau_r_AMPA) :time to peak of the conductance\n"
+  "    tp_NMDA = (tau_r_NMDA*tau_d_NMDA)/(tau_d_NMDA-tau_r_NMDA)*log(tau_d_NMDA/tau_r_NMDA) :time to peak of the conductance\n"
   "\n"
-  "	fa =0\n"
-  "	F = 1\n"
-  "	D1 = 1\n"
-  "	D2 = 1\n"
+  "\n"
   "\n"
   "}\n"
+  "\n"
   "\n"
   "BREAKPOINT {\n"
-  "	SOLVE release METHOD cnexp\n"
+  "    SOLVE state METHOD cnexp\n"
+  "    mggate = 1 / (1 + exp(0.062 (/mV) * -(v)) * (mg / 3.57 (mM))) :mggate kinetics - Jahr & Stevens 1990\n"
+  "    g_AMPA = gmax*(B_AMPA-A_AMPA) :compute time varying conductance as the difference of state variables B_AMPA and A_AMPA\n"
+  "    g_NMDA = gmax*(B_NMDA-A_NMDA) * mggate :compute time varying conductance as the difference of state variables B_NMDA and A_NMDA and mggate kinetics\n"
+  "    g = g_AMPA + g_NMDA\n"
+  "    i_AMPA = g_AMPA*(v-e) * initW :compute the AMPA driving force based on the time varying conductance, membrane potential, and AMPA reversal\n"
+  "    i_NMDA = g_NMDA*(v-e) * initW :compute the NMDA driving force based on the time varying conductance, membrane potential, and NMDA reversal\n"
+  "    i = i_AMPA + i_NMDA\n"
   "}\n"
   "\n"
-  "DERIVATIVE release {\n"
-  "	if (t0>0) {\n"
-  "		if (t-t0 < Cdur_nmda) {\n"
-  "			on_nmda = 1\n"
-  "		} else {\n"
-  "			on_nmda = 0\n"
-  "		}\n"
-  "		if (t-t0 < Cdur_ampa) {\n"
-  "			on_ampa = 1\n"
-  "		} else {\n"
-  "			on_ampa = 0\n"
-  "		}\n"
-  "	}\n"
-  "	r_nmda' = AlphaTmax_nmda*on_nmda*(1-r_nmda) -Beta_nmda*r_nmda\n"
-  "	r_ampa' = AlphaTmax_ampa*on_ampa*(1-r_ampa) -Beta_ampa*r_ampa\n"
   "\n"
-  "	dW_ampa = eta(Capoolcon)*(lambda1*omega(Capoolcon, threshold1, threshold2)-lambda2*W_ampa)*dt\n"
-  "\n"
-  "	: Limit for extreme large weight changes\n"
-  "	if (fabs(dW_ampa) > maxChange) {\n"
-  "		if (dW_ampa < 0) {\n"
-  "			dW_ampa = -1*maxChange\n"
-  "		} else {\n"
-  "			dW_ampa = maxChange\n"
-  "		}\n"
-  "	}\n"
-  "\n"
-  "	:Normalize the weight change\n"
-  "	normW = (W_ampa-Wmin)/(Wmax-Wmin)\n"
-  "	if (dW_ampa < 0) {\n"
-  "		scaleW = sqrt(fabs(normW))\n"
-  "	} else {\n"
-  "		scaleW = sqrt(fabs(1.0-normW))\n"
-  "	}\n"
-  "\n"
-  "	W_ampa = W_ampa + dW_ampa*scaleW *(1+ (wACH * (ACH - 1))) * LearningShutDown\n"
-  "	\n"
-  "	:Weight value limits\n"
-  "	if (W_ampa > Wmax) { \n"
-  "		W_ampa = Wmax\n"
-  "	} else if (W_ampa < Wmin) {\n"
-  " 		W_ampa = Wmin\n"
-  "	}\n"
-  "\n"
-  "	g_nmda = gbar_nmda*r_nmda * facfactor\n"
-  "	:i_nmda = W_nmda*g_nmda*(v - Erev_nmda)*sfunc(v)\n"
-  "	i_nmda = initW*g_nmda*(v - Erev_nmda)*sfunc(v)\n"
-  "\n"
-  "	g_ampa = gbar_ampa*r_ampa * facfactor\n"
-  "	:i_ampa = W_ampa*g_ampa*(v - Erev_ampa)  * (1 + (bACH * (ACH-1)))*(aDA + (bDA * (DA-1))) \n"
-  "	i_ampa = initW*g_ampa*(v - Erev_ampa)  * (1 + (bACH * (ACH-1)))*(aDA + (bDA * (DA-1))) \n"
-  "\n"
-  "	ICa = P0*g_nmda*(v - ECa)*sfunc(v)\n"
-  "	Capoolcon'= -fCa*Afactor*ICa + (Cainf-Capoolcon)/tauCa\n"
+  "DERIVATIVE state{\n"
+  "    A_AMPA' = -A_AMPA/tau_r_AMPA\n"
+  "    B_AMPA' = -B_AMPA/tau_d_AMPA\n"
+  "    A_NMDA' = -A_NMDA/tau_r_NMDA\n"
+  "    B_NMDA' = -B_NMDA/tau_d_NMDA\n"
   "}\n"
   "\n"
-  "NET_RECEIVE(dummy_weight) {\n"
-  "	t0 = t :spike time for conductance opening\n"
-  "	\n"
-  "	:Added by Ali, Synaptic facilitation\n"
-  "	F  = 1 + (F-1)* exp(-(t - tsyn)/tauF)\n"
-  "	D1 = 1 - (1-D1)*exp(-(t - tsyn)/tauD1)\n"
-  "	D2 = 1 - (1-D2)*exp(-(t - tsyn)/tauD2)\n"
-  " :printf(\"%g\\t%g\\t%g\\t%g\\t%g\\t%g\\n\", t, t-tsyn, F, D1, D2, facfactor)\n"
-  "	tsyn = t\n"
-  "	\n"
-  "	facfactor = 1:  F * D1 * D2\n"
-  "	\n"
   "\n"
-  "	F = F * f\n"
-  "	\n"
-  "	if (F > 30) { \n"
-  "	F=30\n"
-  "	}\n"
-  "	D1 = D1 * d1\n"
-  "	D2 = D2 * d2\n"
-  ":printf(\"\\t%g\\t%g\\t%g\\n\", F, D1, D2)\n"
-  "	\n"
+  "NET_RECEIVE (weight, weight_AMPA, weight_NMDA, R, Pr, u, tsyn (ms), nc_type){\n"
+  "    LOCAL result\n"
+  "    weight_AMPA = weight\n"
+  "    weight_NMDA = weight * NMDA_ratio\n"
+  "\n"
+  "    INITIAL{\n"
+  "        R=1\n"
+  "        u=u0\n"
+  "        tsyn=t\n"
+  "    }\n"
+  "\n"
+  "    : Disable in case of t < 0 (in case of ForwardSkip) which causes numerical\n"
+  "    : instability if synapses are activated.\n"
+  "    if(t < 0 ) {\n"
+  "    VERBATIM\n"
+  "        return;\n"
+  "    ENDVERBATIM\n"
+  "    }\n"
+  "\n"
+  "    if (flag == 1) {\n"
+  "        : self event to set next weight at delay\n"
+  "          weight = conductance\n"
+  "\n"
+  "    }\n"
+  "    : flag == 0, i.e. a spike has arrived\n"
+  "\n"
+  "    : calc u at event-\n"
+  "    u = Use\n"
+  "\n"
+  "    Pr  = u * R                         :Pr is calculated as R * u (running value of Use)\n"
   "\n"
   "\n"
+  "    :if( verboseLevel > 0 ) {\n"
+  "        :printf(\"Synapse %f at time %g: R = %g Pr = %g erand = %g\\n\", synapseID, t, R, Pr, result )\n"
+  "    :}\n"
+  "\n"
+  "    tsyn = t\n"
+  "\n"
+  "    A_AMPA = A_AMPA + Pr*weight_AMPA\n"
+  "    B_AMPA = B_AMPA + Pr*weight_AMPA\n"
+  "    A_NMDA = A_NMDA + Pr*weight_NMDA\n"
+  "    B_NMDA = B_NMDA + Pr*weight_NMDA\n"
+  "\n"
+  "    if( verboseLevel > 0 ) {\n"
+  "        printf( \" vals %g %g %g %g\\n\", A_AMPA, weight_AMPA, weight )\n"
+  "    }\n"
   "}\n"
   "\n"
-  ":::::::::::: FUNCTIONs and PROCEDUREs ::::::::::::\n"
   "\n"
-  "FUNCTION sfunc (v (mV)) {\n"
-  "	UNITSOFF\n"
-  "	sfunc = 1/(1+0.33*exp(-0.06*v))\n"
-  "	UNITSON\n"
-  "}\n"
-  "\n"
-  "FUNCTION eta(Cani (mM)) {\n"
-  "	LOCAL taulearn, P1, P2, P4, Cacon\n"
-  "	P1 = 0.1\n"
-  "	P2 = P1*1e-4\n"
-  "	P4 = 1\n"
-  "	Cacon = Cani*1e3\n"
-  "	taulearn = P1/(P2+Cacon*Cacon*Cacon)+P4\n"
-  "	eta = 1/taulearn*0.001\n"
-  "}\n"
-  "\n"
-  "FUNCTION omega(Cani (mM), threshold1 (uM), threshold2 (uM)) {\n"
-  "	LOCAL r, mid, Cacon\n"
-  "	Cacon = Cani*1e3\n"
-  "	r = (threshold2-threshold1)/2\n"
-  "	mid = (threshold1+threshold2)/2\n"
-  "	if (Cacon <= threshold1) { omega = 0}\n"
-  "	else if (Cacon >= threshold2) {	omega = 1/(1+50*exp(-50*(Cacon-threshold2)))}\n"
-  "	else {omega = -sqrt(r*r-(Cacon-mid)*(Cacon-mid))}\n"
+  "FUNCTION toggleVerbose() {\n"
+  "    verboseLevel = 1-verboseLevel\n"
   "}\n"
   ;
 #endif
