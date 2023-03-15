@@ -40,7 +40,7 @@ NEURON {
 PARAMETER {
     initW        = 1       : added by Greg Glickert to scale synaptic weight for large scale modeling
     tau_r_GABAA  = 1   (ms) : dual-exponential conductance profile
-    tau_d_GABAA  = 6     (ms) : IMPORTANT: tau_r < tau_d
+    tau_d_GABAA  = 20:6     (ms) : IMPORTANT: tau_r < tau_d
  
     Use          = 1.0   (1)  : Utilization of synaptic efficacy
     Dep          = 100   (ms) : relaxation time constant from depression

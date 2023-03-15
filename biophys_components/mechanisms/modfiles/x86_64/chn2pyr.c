@@ -634,7 +634,7 @@ static const char* nmodl_file_text =
   "PARAMETER {\n"
   "    initW        = 12       : added by Greg Glickert to scale synaptic weight for large scale modeling\n"
   "    tau_r_GABAA  = 3   (ms) : dual-exponential conductance profile\n"
-  "    tau_d_GABAA  = 6     (ms) : IMPORTANT: tau_r < tau_d\n"
+  "    tau_d_GABAA  = 6    (ms) : IMPORTANT: tau_r < tau_d\n"
   " \n"
   "    Use          = 1.0   (1)  : Utilization of synaptic efficacy\n"
   "    Dep          = 100   (ms) : relaxation time constant from depression\n"

@@ -148,7 +148,6 @@ extern void hoc_reg_nmodl_filename(int, const char*);
 };
  static HocParmUnits _hoc_parm_units[] = {
  "tau_r_GABAA", "ms",
- "tau_d_GABAA", "ms",
  "Use", "1",
  "Dep", "ms",
  "Fac", "ms",
@@ -229,7 +228,7 @@ static void nrn_alloc(Prop* _prop) {
  	/*initialize range parameters*/
  	initW = 1;
  	tau_r_GABAA = 1;
- 	tau_d_GABAA = 6;
+ 	tau_d_GABAA = 20;
  	Use = 1;
  	Dep = 100;
  	Fac = 10;
@@ -634,7 +633,7 @@ static const char* nmodl_file_text =
   "PARAMETER {\n"
   "    initW        = 1       : added by Greg Glickert to scale synaptic weight for large scale modeling\n"
   "    tau_r_GABAA  = 1   (ms) : dual-exponential conductance profile\n"
-  "    tau_d_GABAA  = 6     (ms) : IMPORTANT: tau_r < tau_d\n"
+  "    tau_d_GABAA  = 20:6     (ms) : IMPORTANT: tau_r < tau_d\n"
   " \n"
   "    Use          = 1.0   (1)  : Utilization of synaptic efficacy\n"
   "    Dep          = 100   (ms) : relaxation time constant from depression\n"
