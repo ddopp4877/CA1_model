@@ -131,6 +131,9 @@ def Pyr2Chn(syn_params, sec_x, sec_id):
         lsyn.gbar_nmda = float(syn_params['gbar_nmda']) # par.x(28)
     if syn_params.get('Erev_nmda'):
         lsyn.Erev_nmda = float(syn_params['Erev_nmda']) # par.x(16)
+        
+    if syn_params.get('gmax'):
+        lsyn.gmax = float(syn_params['gmax']) # par.x(16)
     
     if syn_params.get('initW'):
         m = syn_params.get('initW_lognormal_mean')
@@ -308,6 +311,9 @@ def PV2CHN(syn_params, sec_x, sec_id):
         lsyn.gbar_gaba = float(syn_params['gbar_gaba']) # par.x(24)
     if syn_params.get('Erev_gaba'):
         lsyn.Erev_gaba = float(syn_params['Erev_gaba']) # par.x(16)
+        
+    if syn_params.get('gmax'):
+        lsyn.gmax = float(syn_params['gmax']) # par.x(16)
 
     if syn_params.get('initW'):
         m = syn_params.get('initW_lognormal_mean')
@@ -543,6 +549,8 @@ def PV2Pyr(syn_params, sec_x, sec_id):
     if syn_params.get('gmax'):
         lsyn.gmax = float(syn_params['gmax']) # par.x(16)
 
+    if  syn_params.get('tau_d_GABAA'):
+        lsyn.tau_d_GABAA = float(syn_params['tau_d_GABAA'])
 
     if syn_params.get('initW'):
         m = syn_params.get('initW_lognormal_mean')
@@ -930,6 +938,9 @@ def OLM2Pyr(syn_params, sec_x, sec_id):
         lsyn.gbar_gaba = float(syn_params['gbar_gaba'])  # par.x(24)
     if syn_params.get('Erev_gaba'):
         lsyn.Erev_gaba = float(syn_params['Erev_gaba'])  # par.x(16)
+        
+    if syn_params.get('gmax'):
+        lsyn.gmax = float(syn_params['gmax'])  # par.x(16)
 
     if syn_params.get('initW'):
         m = syn_params.get('initW_lognormal_mean')

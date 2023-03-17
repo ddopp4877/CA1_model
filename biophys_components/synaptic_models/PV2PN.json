@@ -3,6 +3,7 @@
     "gmax": "20",
     "initW": "1",
     "initW_lognormal_mean": 5,
-    "initW_lognormal_std": 0.3
+    "initW_lognormal_std": 0.3,
+    "tau_d_GABAA": 40 
 
 }
