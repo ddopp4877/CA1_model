@@ -352,7 +352,7 @@ proc insert_mechs() {
 
 
 		for i=0,11 axon[i] {
-			insert pas e_pas=eleakval g_pas = 1/Rm Ra=RaAx cm=CmAx
+			insert pas e_pas=eleakval g_pas = 1/Rm *1.1 Ra=RaAx cm=CmAx
 			insert na16
 			insert kv
 		}
@@ -401,32 +401,42 @@ proc insert_mechs() {
 		insert pas e_pas=eleakval g_pas = 1/RmDend Ra=RaAll cm=CmDend
 	}
 
-	for i=0,NumApical-1 apical[i] {
-		insert pas e_pas=eleakval g_pas = 1/RmDend Ra=RaAll  cm=CmDend
-		if (diam>0.5 && distance(0.5)<500) {
-			insert ch_HCNp gmax_ch_HCNp = gHCN
-			insert ch_Navp 
-			ar2_ch_Navp=0.8
-			gmax_ch_Navp=gNav
-			insert ch_Kdrp 
-			gmax_ch_Kdrp=gKdr
-			insert ch_KvAproxp
-			insert ch_KvAdistp
-			gmax_ch_KvAproxp=0
-			gmax_ch_KvAdistp=0
 
-			for (x){ xdist = distance(x)
-				if (xdist>500) {xdist=500}
-				gmax_ch_HCNp(x) = gHCN*(1+1.5*xdist/100)
-				if (xdist > 100){
-					vhalfl_ch_HCNp=-90
-					gmax_ch_KvAdistp(x) = gKvAdist*(1+xdist/100)
-				} else {
-					vhalfl_ch_HCNp=-82
-					gmax_ch_KvAproxp(x) = gKvAprox*(1+xdist/100)
-				}
-			}
-		}
+for i=0, 2 apical[i]{
+
+		insert pas e_pas=eleakval g_pas = 1/RmDend*0.95 Ra=RaAll  cm=CmDend
+		
+			insert ch_HCNp
+      gmax_ch_HCNp = gHCN
+      vhalfl_ch_HCNp=-90
+      
+			insert ch_Navp 
+			gmax_ch_Navp=gNav*0.6
+      
+			insert ch_Kdrp 
+			gmax_ch_Kdrp=gKdr*0.52
+      }
+
+
+	for i=2,NumApical-1 apical[i] {
+		insert pas e_pas=eleakval g_pas = 1/RmDend *0.9 Ra=RaAll  cm=CmDend
+		
+			insert ch_HCNp
+      gmax_ch_HCNp = gHCN
+      vhalfl_ch_HCNp=-90
+      
+//			insert ch_Navp 
+//			gmax_ch_Navp=gNav
+      
+			insert ch_Kdrp 
+			gmax_ch_Kdrp=gKdr*0.2
+      
+//			insert ch_KvAproxp
+//      gmax_ch_KvAproxp=gKvAprox*0.1
+      
+//			insert ch_KvAdistp
+//			gmax_ch_KvAdistp=gKvAdist
+
 	}
 
 	forall {

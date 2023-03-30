@@ -865,6 +865,8 @@ def OLM2OLM(syn_params, sec_x, sec_id):
         lsyn.gbar_gaba = float(syn_params['gbar_gaba'])  # par.x(24)
     if syn_params.get('Erev_gaba'):
         lsyn.Erev_gaba = float(syn_params['Erev_gaba'])  # par.x(16)
+    if syn_params.get('gmax'):
+        lsyn.gmax = float(syn_params['gmax'])  # par.x(16)
 
     if syn_params.get('initW'):
         m = syn_params.get('initW_lognormal_mean')
@@ -1026,6 +1028,9 @@ def Pyr2OLM(syn_params, sec_x, sec_id):
         lsyn.gbar_nmda = float(syn_params['gbar_nmda'])  # par.x(28)
     if syn_params.get('Erev_nmda'):
         lsyn.Erev_nmda = float(syn_params['Erev_nmda'])  # par.x(16)
+        
+    if syn_params.get('gmax'):
+        lsyn.gmax = float(syn_params['gmax'])  # par.x(16)
 
     if syn_params.get('initW'):
         m = syn_params.get('initW_lognormal_mean')

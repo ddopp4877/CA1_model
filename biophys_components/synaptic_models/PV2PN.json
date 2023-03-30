@@ -1,9 +1,9 @@
 {
     "level_of_detail": "pv2pyr",
-    "gmax": "20",
+    "gmax": "0.5",
     "initW": "1",
     "initW_lognormal_mean": 5,
     "initW_lognormal_std": 0.3,
-    "tau_d_GABAA": 40 
+    "tau_d_GABAA": 60 
 
 }
