@@ -1,6 +1,6 @@
 {
     "level_of_detail": "olm2chn",
-    "gmax": "0.06",
+    "gmax": "0.006",
     "initW": "1",
     "initW_lognormal_mean": 1.5,
     "initW_lognormal_std": 0.3

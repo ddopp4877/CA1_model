@@ -229,6 +229,9 @@ def Pyr2Pv(syn_params, sec_x, sec_id):
     if syn_params.get('Erev_nmda'):
         lsyn.Erev_nmda = float(syn_params['Erev_nmda'])  # par.x(16)
 
+    if syn_params.get('gmax'):
+        lsyn.gmax = float(syn_params['gmax'])  # par.x(16)
+        
     if syn_params.get('initW'):
         m = syn_params.get('initW_lognormal_mean')
         s = syn_params.get('initW_lognormal_std')
