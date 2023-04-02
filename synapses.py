@@ -1034,6 +1034,9 @@ def Pyr2OLM(syn_params, sec_x, sec_id):
         
     if syn_params.get('gmax'):
         lsyn.gmax = float(syn_params['gmax'])  # par.x(16)
+    if syn_params.get('tau_d_NMDA'):
+        lsyn.tau_d_NMDA = float(syn_params['tau_d_NMDA'])  # par.x(16)    
+        
 
     if syn_params.get('initW'):
         m = syn_params.get('initW_lognormal_mean')

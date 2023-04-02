@@ -5,6 +5,7 @@
 /biophys_components/mechanisms/modfiles/*.[co]
 /CA1_inputs
 /updated_conns
+/CA1Results
 *.png
 .DS_Store
 /nrn
