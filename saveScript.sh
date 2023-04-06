@@ -16,4 +16,5 @@ echo "$input_string">"$targetFolder/README.txt"
 cp -r "output" $targetFolder
 cp -r "network" $targetFolder
 cp -r "biophys_components" $targetFolder
+cp "simulation_configLFP.json" $targetFolder
 

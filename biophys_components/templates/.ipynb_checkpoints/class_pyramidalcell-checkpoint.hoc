@@ -339,7 +339,7 @@ proc mechinit() {
 	gKdr     = 0.003 // Kdr conductance in mho/cm2
 	gKvAdist = 0.008 // distal KvA conductance in mho/cm2
 	gKvAprox = 0.008 // proximal KvA conductance in mho/cm2
-	gHCN     = 0.0006 // hcurrent conductance in mho/cm2 --> 6 pS/um2
+	gHCN     = 0//0.0006 // hcurrent conductance in mho/cm2 --> 6 pS/um2
 	gna16_ais_max = 3200
 	gkv_axon = 1000
 }
@@ -422,7 +422,7 @@ for i=0, 2 apical[i]{
 		insert pas e_pas=eleakval g_pas = 1/RmDend *0.9 Ra=RaAll  cm=CmDend
 		
 			insert ch_HCNp
-      gmax_ch_HCNp = gHCN*1.1
+      gmax_ch_HCNp = gHCN
       vhalfl_ch_HCNp=-90
       
 //			insert ch_Navp 
