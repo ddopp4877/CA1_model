@@ -20,7 +20,7 @@ net = NetworkBuilder("biophysical")
 
 # amount of cells
 NetNo = 20000
-#NetNo = 1000
+#NetNo = 300
 IN_num = NetNo*.11#about 11% of all neurons are interneurons in this network (Bezaire 2013). We are only modeling 2, so omit the others, or substitute PV and OLM for all
 PN_num = NetNo -  IN_num
 
@@ -165,17 +165,17 @@ pos_list_SR = setNodes(net,numAAC_inSR,pos_list_SR,'AAC','hoc:axoaxoniccell')
 pos_list_SR = setNodes(net,numPV_inSR,pos_list_SR,'PV','hoc:pvbasketcell')
 
 #############        src     dest   prob      maxd     json              dist_range    secName sid secloc
-conn1 = setEdges(net,'AAC','Pyr',[ 0.072,     400],'CHN2PN.json', [1,            1.1 ],'axon', 6, 0.5)
-conn2 = setEdges(net,'Pyr','AAC',[ 0.009635,  400],'PN2CHN.json', [0.0,        400.0],'apical', 6, 0.5)
-conn3 = setEdges(net,'PV','Pyr', [ 0.05366,   400],'PV2PN.json',  [0.0,        400.0],'somatic',0, 0.5)
-conn4 = setEdges(net,'Pyr','PV', [ 0.0238,    400],'PN2PV.json',  [0.0,        400.0],'apical', 6, 0.5)
-conn5 = setEdges(net,'PV','AAC', [ 0.135,     400],'PV2CHN.json', [0.0,        400.0],'somatic',0, 0.5)
-conn6 = setEdges(net,'PV','PV',  [ 0.135,     400],'PV2PV.json',  [0.0,        400.0],'somatic',0, 0.5)
-conn7 = setEdges(net,'OLM','Pyr',[ 0.08300,   400],'OLM2PN.json', [0.0,        400.0],'apical', 4, 0.5)
-conn8 = setEdges(net,'OLM','AAC',[ 0.0800,    400],'OLM2CHN.json',[0.0,        400.0],'apical', 4, 0.5)
-conn9 = setEdges(net,'OLM','PV', [ 0.0800,    400],'OLM2PV.json', [0.0,        400.0],'apical', 4, 0.5)
-conn10 = setEdges(net,'OLM','OLM',[ 0.0800,    400],'OLM2OLM.json',[0.0,        400.0],'basal',  0, 0.9)
-conn11 = setEdges(net,'Pyr','OLM',[  0.1320,   400],'PN2OLM.json',[0.0,        400.0],'basal',  2, 0.5)
+conn1 = setEdges(net,'AAC','Pyr', [ 0.0168,  400],'CHN2PN.json', [1,            1.1 ],'axon',  6, 0.5)
+conn2 = setEdges(net,'Pyr','AAC', [ 0.0121,  400],'PN2CHN.json', [0.0,        400.0],'apical', 6, 0.5)
+conn3 = setEdges(net,'PV','Pyr',  [ 0.0350,  400],'PV2PN.json',  [0.0,        400.0],'somatic',0, 0.5)
+conn4 = setEdges(net,'Pyr','PV',  [ 0.0119,  400],'PN2PV.json',  [0.0,        400.0],'apical', 6, 0.5)
+conn5 = setEdges(net,'PV','AAC',  [ 0.0212,  400],'PV2CHN.json', [0.0,        400.0],'somatic',0, 0.5)
+conn6 = setEdges(net,'PV','PV',   [ 0.02087, 400],'PV2PV.json',  [0.0,        400.0],'somatic',0, 0.5)
+conn7 = setEdges(net,'OLM','Pyr', [ 0.02242, 400],'OLM2PN.json', [0.0,        400.0],'apical', 4, 0.5)
+conn8 = setEdges(net,'OLM','AAC', [ 0.0231,  400],'OLM2CHN.json',[0.0,        400.0],'apical', 4, 0.5)
+conn9 = setEdges(net,'OLM','PV',  [ 0.02276, 400],'OLM2PV.json', [0.0,        400.0],'apical', 4, 0.5)
+conn10 = setEdges(net,'OLM','OLM',[ 0.0222,  400],'OLM2OLM.json',[0.0,        400.0],'basal',  0, 0.9)
+conn11 = setEdges(net,'Pyr','OLM',[ 0.0122,  400],'PN2OLM.json', [0.0,        400.0],'basal',  2, 0.5)
 
 
 
